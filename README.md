@@ -25,7 +25,7 @@ As is typical for [vim-fireplace](https://github.com/tpope/vim-fireplace) you wi
 It is typical to have a `dev.clj` and a `dev` namespace that exposes these functions and starts the system. For example.
 
 ```clojure
-tns dev
+(ns dev
   "Tools for interactive development with the REPL. This file should
   not be included in a production build of the application."
   (:require [com.stuartsierra.component :as component]
