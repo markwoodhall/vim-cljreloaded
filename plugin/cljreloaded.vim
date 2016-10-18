@@ -42,6 +42,16 @@ function! s:Go()
   call s:ReloadedFunc("(go)")
 endfunction
 
+function! s:Refresh()
+  let evalString = "(require '[clojure.tools.namespace.repl :refer [refresh]])(refresh)"
+  execute "Eval ".evalString
+endfunction
+
+function! s:RefreshAll()
+  let evalString = "(require '[clojure.tools.namespace.repl :refer [refresh-all]])(refresh-all)"
+  execute "Eval ".evalString
+endfunction
+
 autocmd FileType clojure command! -buffer ReloadedSystem :exe s:System()
 autocmd FileType clojure command! -buffer ReloadedReset :exe s:Reset()
 autocmd FileType clojure command! -buffer ReloadedResetAll :exe s:ResetAll()
@@ -49,3 +59,5 @@ autocmd FileType clojure command! -buffer ReloadedInit :exe s:Init()
 autocmd FileType clojure command! -buffer ReloadedStart :exe s:Start()
 autocmd FileType clojure command! -buffer ReloadedStop :exe s:Stop()
 autocmd FileType clojure command! -buffer ReloadedGo :exe s:Go()
+autocmd FileType clojure command! -buffer ReloadedRefresh :exe s:Refresh()
+autocmd FileType clojure command! -buffer ReloadedRefreshAll :exe s:RefreshAll()
