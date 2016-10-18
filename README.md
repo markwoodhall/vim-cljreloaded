@@ -47,6 +47,8 @@ The following functions are made available:
 :ReloadedResetAll
 :ReloadedInit
 :ReloadedGo
+:ReloadedRefresh " Not strictly reloaded.repl but exposes the uderlying (refresh) on clojure.tools.namespace.repl
+:ReloadedRefreshAll " Not strictly reloaded.repl but exposes the uderlying (refresh-all) on clojure.tools.namespace.repl
 ```
 
 The above functions map to the functions defined by reloaded.repl.
