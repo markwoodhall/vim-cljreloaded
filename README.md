@@ -22,7 +22,7 @@ Plug 'tpope/vim-fireplace'
 
 As is typical for [vim-fireplace](https://github.com/tpope/vim-fireplace) you will need a running REPL, `lein repl`.
 
-In it typical to have a `dev.clj` and a `dev` namespace that exposes these functions and starts the system. For example.
+It is typical to have a `dev.clj` and a `dev` namespace that exposes these functions and starts the system. For example.
 
 ```clojure
 tns dev
