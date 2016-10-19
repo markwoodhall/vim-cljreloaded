@@ -2,6 +2,7 @@ if exists('g:loaded_cljreloaded') || &cp
   finish
 endif
 let g:loaded_cljreloaded = 1
+let g:loaded_cljreloaded = 1
 
 if !exists("*fireplace#eval")
   echoerr "vim-cljreloaded requires the vim-fireplace plugin but it is not currently loaded or installed."
@@ -9,17 +10,36 @@ if !exists("*fireplace#eval")
 endif
 
 function! s:ReloadedFunc(eval)
-  let evalString = "(in-ns 'dev) ".a:eval
-  execute "Eval ".evalString
+  let output = fireplace#echo_session_eval(a:eval, {"ns": b:cljreloaded_dev_ns})
+  echo output
+endfunction
+
+if !exists('b:cljreloaded_dev_ns')
+  let b:cljreloaded_dev_ns = 'dev'
+  silent call s:ReloadedFunc("(in-ns 'dev)")
+endif
+
+function! s:InNs(ns)
+  let b:cljreloaded_dev_ns = a:ns
+  call s:ReloadedFunc("(in-ns '".a:ns.")")
+endfunction
+
+function! s:UseNs(ns)
+  call s:ReloadedFunc("(use '".a:ns.")")
 endfunction
 
 function! s:System()
-  let evalString = "(in-ns 'dev) (require '[clojure.pprint :refer [pprint]]) (pprint system)"
-  execute "Eval ".evalString
+  let evalString = "(require '[clojure.pprint :refer [pprint]]) (pprint system)"
+  call s:ReloadedFunc(evalString)
+endfunction
+
+function! s:AllNs()
+  let eval = "(vec (map str (all-ns)))"
+  return fireplace#eval(eval)
 endfunction
 
 function! s:Reset()
-    call s:ReloadedFunc("(reset)")
+  call s:ReloadedFunc("(reset)")
 endfunction
 
 function! s:ResetAll()
@@ -44,14 +64,24 @@ endfunction
 
 function! s:Refresh()
   let evalString = "(require '[clojure.tools.namespace.repl :refer [refresh]])(refresh)"
-  execute "Eval ".evalString
+  call s:ReloadedFunc(evalString)
 endfunction
 
 function! s:RefreshAll()
   let evalString = "(require '[clojure.tools.namespace.repl :refer [refresh-all]])(refresh-all)"
-  execute "Eval ".evalString
+  call s:ReloadedFunc(evalString)
 endfunction
 
+function! s:NsComplete(A, L, P) abort
+  if strpart(a:L, 0, a:P) !~# ' [[:alnum:]-]\+ '
+    let cmds = s:AllNs()
+    let cmds = substitute(cmds, " ", ", ", "g")
+    return filter(eval(cmds), 'strpart(v:val, 0, strlen(a:A)) ==# a:A')
+  endif
+endfunction
+
+autocmd FileType clojure command! -nargs=1 -complete=customlist,s:NsComplete -buffer ReloadedInNs :exe s:InNs(<q-args>)
+autocmd FileType clojure command! -nargs=1 -complete=customlist,s:NsComplete -buffer ReloadedUseNs :exe s:UseNs(<q-args>)
 autocmd FileType clojure command! -buffer ReloadedSystem :exe s:System()
 autocmd FileType clojure command! -buffer ReloadedReset :exe s:Reset()
 autocmd FileType clojure command! -buffer ReloadedResetAll :exe s:ResetAll()
