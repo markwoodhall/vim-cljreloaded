@@ -112,5 +112,6 @@ In the above example I had the following mapping in place.
 autocmd filetype clojure nnoremap <buffer> hld :ReloadedHotLoadDependencyUnderCursor<CR>
 ```
 
+It is worth pointing out that as it currently stands this command will block until the dependency and all its requirements have downloaded. 
 ## License
 Copyright © Mark Woodhall. Distributed under the same terms as Vim itself. See `:help license`
