@@ -77,7 +77,7 @@ Calls the `(go)` function defined by `reloaded.repl`.
 ![Go example](http://i.imgur.com/rALjXYy.png)
 
 ### `:ReloadedSystem`
-Pretty prints the system
+Pretty prints the `system`.
 
 ![System example](http://i.imgur.com/QjrkGHG.png)
 
@@ -117,6 +117,6 @@ In the above example I had the following mapping in place.
 autocmd filetype clojure nnoremap <buffer> hld :ReloadedHotLoadDependencyUnderCursor<CR>
 ```
 
-It is worth pointing out that as it currently stands this command will block until the dependency and all its requirements have downloaded. 
+It is worth pointing out that as it currently stands this command will block until the dependency and all its requirements have downloaded.
 ## License
 Copyright © Mark Woodhall. Distributed under the same terms as Vim itself. See `:help license`
