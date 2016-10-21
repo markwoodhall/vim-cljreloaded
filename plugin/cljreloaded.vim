@@ -2,7 +2,6 @@ if exists('g:loaded_cljreloaded') || &cp
   finish
 endif
 let g:loaded_cljreloaded = 1
-let g:loaded_cljreloaded = 1
 
 if !exists("*fireplace#eval")
   echoerr "vim-cljreloaded requires the vim-fireplace plugin but it is not currently loaded or installed."
@@ -33,8 +32,11 @@ function! s:System()
   call s:ReloadedFunc(evalString)
 endfunction
 
-function! s:AllNs()
-  let eval = "(vec (map str (all-ns)))"
+function! s:AllNs(term)
+  let eval = "
+              \ (use '[clojure.tools.namespace :only [find-namespaces-on-classpath]])
+              \ (let [namespaces (map str (find-namespaces-on-classpath))]
+              \   (vec (filter #(clojure.string/starts-with? %1 \"".a:term."\") namespaces)))"
   return fireplace#eval(eval)
 endfunction
 
@@ -72,9 +74,34 @@ function! s:RefreshAll()
   call s:ReloadedFunc(evalString)
 endfunction
 
+function! s:HotLoadDependency(dependency)
+  let output = fireplace#eval("(str (empty? (keys (try (ns-publics 'cemerick.pomegranate) (catch Exception e [])))))")
+  if output =~ "true"
+    echoerr "vim-cljreloaded requires com.cemerick/pomegranate >= \"0.3.1\" in order to hot load dependencies."
+  else
+    let evalString = "
+                      \ (use '[cemerick.pomegranate :only (add-dependencies)])
+                      \ (add-dependencies
+                      \   :coordinates '[[".a:dependency."]]
+                      \   :repositories (merge cemerick.pomegranate.aether/maven-central
+                      \                 {\"clojars\" \"http://clojars.org/repo\"}))"
+    call s:ReloadedFunc(evalString)
+  endif
+endfunction
+
+function! s:HotLoadDependencyUnderCursor()
+    let cursorPos = getpos('.')
+    call search(']')
+    let endCursorPos = getpos('.')
+    let line = getline('.')
+    let dep = strpart(line, cursorPos[2]-1, (endCursorPos[2]-1)-(cursorPos[2]-1))
+    call s:HotLoadDependency(dep)
+    call setpos('.', cursorPos)
+endfunction
+
 function! s:NsComplete(A, L, P) abort
   if strpart(a:L, 0, a:P) !~# ' [[:alnum:]-]\+ '
-    let cmds = s:AllNs()
+    let cmds = s:AllNs(a:A)
     let cmds = substitute(cmds, " ", ", ", "g")
     return filter(eval(cmds), 'strpart(v:val, 0, strlen(a:A)) ==# a:A')
   endif
@@ -82,6 +109,7 @@ endfunction
 
 autocmd FileType clojure command! -nargs=1 -complete=customlist,s:NsComplete -buffer ReloadedInNs :exe s:InNs(<q-args>)
 autocmd FileType clojure command! -nargs=1 -complete=customlist,s:NsComplete -buffer ReloadedUseNs :exe s:UseNs(<q-args>)
+autocmd FileType clojure command! -nargs=1 -buffer ReloadedHotLoadDep :exe s:HotLoadDependency(<q-args>)
 autocmd FileType clojure command! -buffer ReloadedSystem :exe s:System()
 autocmd FileType clojure command! -buffer ReloadedReset :exe s:Reset()
 autocmd FileType clojure command! -buffer ReloadedResetAll :exe s:ResetAll()
@@ -91,3 +119,4 @@ autocmd FileType clojure command! -buffer ReloadedStop :exe s:Stop()
 autocmd FileType clojure command! -buffer ReloadedGo :exe s:Go()
 autocmd FileType clojure command! -buffer ReloadedRefresh :exe s:Refresh()
 autocmd FileType clojure command! -buffer ReloadedRefreshAll :exe s:RefreshAll()
+autocmd FileType clojure command! -buffer ReloadedHotLoadDependencyUnderCursor :exe s:HotLoadDependencyUnderCursor()
