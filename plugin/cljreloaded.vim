@@ -32,12 +32,17 @@ function! s:System()
   call s:ReloadedFunc(evalString)
 endfunction
 
+function! s:ToList(input)
+  let parsed = substitute(a:input, " ", ", ", "g")
+  return eval(parsed)
+endfunction
+
 function! s:AllNs(term)
   let eval = "
               \ (use '[clojure.tools.namespace :only [find-namespaces-on-classpath]])
               \ (let [namespaces (map str (find-namespaces-on-classpath))]
               \   (vec (filter #(clojure.string/starts-with? %1 \"".a:term."\") namespaces)))"
-  return fireplace#eval(eval)
+  return s:ToList(fireplace#eval(eval))
 endfunction
 
 function! s:Reset()
@@ -75,8 +80,7 @@ function! s:RefreshAll()
 endfunction
 
 function! s:HotLoadDependency(dependency)
-  let output = fireplace#eval("(str (empty? (keys (try (ns-publics 'cemerick.pomegranate) (catch Exception e [])))))")
-  if output =~ "true"
+  if s:AllNs("cemerick.pomegranate") == []
     echoerr "vim-cljreloaded requires com.cemerick/pomegranate >= \"0.3.1\" in order to hot load dependencies."
   else
     let evalString = "
@@ -102,8 +106,7 @@ endfunction
 function! s:NsComplete(A, L, P) abort
   if strpart(a:L, 0, a:P) !~# ' [[:alnum:]-]\+ '
     let cmds = s:AllNs(a:A)
-    let cmds = substitute(cmds, " ", ", ", "g")
-    return filter(eval(cmds), 'strpart(v:val, 0, strlen(a:A)) ==# a:A')
+    return filter(cmds, 'strpart(v:val, 0, strlen(a:A)) ==# a:A')
   endif
 endfunction
 
