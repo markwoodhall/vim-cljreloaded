@@ -76,6 +76,11 @@ Calls the `(go)` function defined by `reloaded.repl`.
 
 ![Go example](http://i.imgur.com/rALjXYy.png)
 
+### `:ReloadedSystem`
+Pretty prints the system
+
+![System example](http://i.imgur.com/QjrkGHG.png)
+
 **The functions below are not strictly `reloaded.repl` related but they may enhance a "reloaded" workflow in vim.**
 
 ### `:ReloadedRefresh`
