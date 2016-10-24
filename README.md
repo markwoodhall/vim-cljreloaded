@@ -2,7 +2,7 @@
 
 To have a better [reloaded](http://thinkrelevance.com/blog/2013/06/04/clojure-workflow-reloaded) workflow when using vim.
 
-This plugin makes available the functions defined by the [reloaded.repl](https://github.com/weavejester/reloaded.repl) for use with Stuart Sierras [component](https://github.com/stuartsierra/component).
+This plugin makes available the functions defined by the [reloaded.repl](https://github.com/weavejester/reloaded.repl) for use with Stuart Sierra's [component](https://github.com/stuartsierra/component).
 
 For hot loading dependencies this plugin makes use of [cemerick.pomegranate](https://github.com/cemerick/pomegranate).
 
