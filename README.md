@@ -142,7 +142,8 @@ This is the same as `:ReloadedHotLoadDepFzf` but `SNAPSHOT` jars are automatical
 It is worth pointing out that as it currently stands any command that hot loads a dependency will block until the dependency and all its requirements have downloaded.
 
 It is also worth noting that dependency completions are a bit of a hack at the moment. When enabled the plugin will request data from the [all-jars.clj](https://clojars.org/repo/all-jars.clj) endpoint
-provided by [Clojars](https://clojars.org/). The data is currently just over **4mb** and is loaded into a running nREPL session asynchronously, it is then used as a completion source.
+provided by [Clojars](https://clojars.org/). The data is currently just over **4mb** and is built by [Clojars](https://clojars.org/) every hour, it is loaded into a running nREPL session asynchronously, it is then used as a completion source. At somepoint it would be sensible
+to change to use "real time" searching of Clojars but this is working for me now, so I've made it available.
 
 Once the data is downloaded it won't be downloaded again until the plugin is reloaded or you manually call `:ReloadedLoadAvailableJars`.
 
