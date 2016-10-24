@@ -117,6 +117,46 @@ In the above example I had the following mapping in place.
 autocmd filetype clojure nnoremap <buffer> hld :ReloadedHotLoadDependencyUnderCursor<CR>
 ```
 
-It is worth pointing out that as it currently stands this command will block until the dependency and all its requirements have downloaded.
+### `:ReloadedHotLoadDep`
+
+Hot load a specified dependency into a running nREPL session. Supports tab completions on the dependency using a list
+of jars from [Clojars](https://clojars.org/).
+
+![Hot load example](http://i.imgur.com/lgjVs0P.png)
+
+### `:ReloadedHotLoadDepFzf`
+
+Hot load a specified dependency into a running nREPL session. Supports selection of the dependency using a list
+of jars from [Clojars](https://clojars.org/) as a source for the [fzf.vim selector](https://github.com/junegunn/fzf.vim).
+
+![Hot load example](http://i.imgur.com/KCXlGk0.png)
+
+### `:ReloadedHotLoadDepNoSnapshotsFzf`
+
+This is the same as `:ReloadedHotLoadDepFzf` but `SNAPSHOT` jars are automatically filtered out.
+
+![Hot load example](http://i.imgur.com/k8mgV1g.png)
+
+### Notes about hot loading and completion
+
+It is worth pointing out that as it currently stands any command that hot loads a dependency will block until the dependency and all its requirements have downloaded.
+
+It is also worth noting that dependency completions are a bit of a hack at the moment. When enabled the plugin will request data from the [all-jars.clj](https://clojars.org/repo/all-jars.clj) endpoint
+provided by [Clojars](https://clojars.org/). The data is currently just over **4mb** and is loaded into a running nREPL session asynchronously, it is then used as a completion source.
+
+Once the data is downloaded it won't be downloaded again until the plugin is reloaded or you manually call `:ReloadedLoadAvailableJars`.
+
+Fetching data from [Clojars](https://clojars.org/) is enabled by default but can be disabled with the following.
+
+```vim
+let g:cljreloaded_queryclojars = 0
+```
+
+If you need to use a different source for available jars then you can set the following.
+
+```vim
+let g:cljreloaded_clojarsurl = "http://clojars.org/repo/all-jars.clj"
+```
+
 ## License
 Copyright © Mark Woodhall. Distributed under the same terms as Vim itself. See `:help license`
