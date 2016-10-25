@@ -22,7 +22,7 @@ endfunction
 
 if !exists('b:cljreloaded_dev_ns')
   let b:cljreloaded_dev_ns = 'dev'
-  silent call s:ReloadedFunc("(in-ns 'dev)")
+  silent call s:ReloadedFunc("(if (find-ns 'dev) (in-ns 'dev))")
 endif
 
 function! s:InNs(ns)
@@ -46,9 +46,11 @@ endfunction
 
 function! s:AllNs(term)
   let eval = "
-              \ (use '[clojure.tools.namespace :only [find-namespaces-on-classpath]])
-              \ (let [namespaces (map str (find-namespaces-on-classpath))]
-              \   (vec (filter #(clojure.string/starts-with? %1 \"".a:term."\") namespaces)))"
+              \ (try
+              \   (use '[clojure.tools.namespace :only [find-namespaces-on-classpath]])
+              \   (let [namespaces (map str (find-namespaces-on-classpath))]
+              \     (vec (filter #(clojure.string/starts-with? %1 \"".a:term."\") namespaces)))
+              \   (catch Exception error []))"
   return s:ToList(fireplace#eval(eval))
 endfunction
 
