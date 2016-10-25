@@ -11,32 +11,13 @@ if !exists("*fireplace#eval")
   finish
 endif
 
-function! s:ReloadedFunc(eval)
-  let output = fireplace#session_eval(a:eval, {"ns": b:cljreloaded_dev_ns})
+function! s:SendToRepl(eval)
+  let output = fireplace#session_eval(a:eval, {"ns": s:cljreloaded_dev_ns})
   echo output
 endfunction
 
-function! s:SilentReloadedFunc(eval)
-  call fireplace#session_eval(a:eval, {"ns": b:cljreloaded_dev_ns})
-endfunction
-
-if !exists('b:cljreloaded_dev_ns')
-  let b:cljreloaded_dev_ns = 'dev'
-  silent call s:ReloadedFunc("(if (find-ns 'dev) (in-ns 'dev))")
-endif
-
-function! s:InNs(ns)
-  let b:cljreloaded_dev_ns = a:ns
-  call s:ReloadedFunc("(in-ns '".a:ns.")")
-endfunction
-
-function! s:UseNs(ns)
-  call s:ReloadedFunc("(use '".a:ns.")")
-endfunction
-
-function! s:System()
-  let evalString = "(require '[clojure.pprint :refer [pprint]]) (pprint system)"
-  call s:ReloadedFunc(evalString)
+function! s:SilentSendToRepl(eval)
+  call fireplace#session_eval(a:eval, {"ns": s:cljreloaded_dev_ns})
 endfunction
 
 function! s:ToList(input)
@@ -48,24 +29,67 @@ function! s:AllNs(term)
   let eval = "
               \ (try
               \   (use '[clojure.tools.namespace :only [find-namespaces-on-classpath]])
-              \   (let [namespaces (map str (find-namespaces-on-classpath))]
-              \     (vec (filter #(clojure.string/starts-with? %1 \"".a:term."\") namespaces)))
               \   (catch Exception error []))"
-  return s:ToList(fireplace#eval(eval))
+
+  let exists = fireplace#eval(eval)
+  if exists == "nil"
+    let eval = "
+              \ (let [namespaces (map str (find-namespaces-on-classpath))]
+              \   (vec (filter #(clojure.string/starts-with? %1 \"".a:term."\") namespaces)))"
+    return s:ToList(fireplace#eval(eval))
+  else
+    echoerr "vim-cljreloaded requires org.clojure/tools.namespace >= \"0.2.11\" in order to inspect namespaces."
+  endif
+endfunction
+
+function! s:SendToReloadedRepl(eval)
+  if s:AllNs("reloaded.repl") == []
+    echoerr "vim-cljreloaded requires reloaded.repl >= \"0.2.3\" in order to use reloaded workflow functions."
+  else
+    let output = fireplace#session_eval(a:eval, {"ns": s:cljreloaded_dev_ns})
+    echo output
+  endif
+endfunction
+
+function! s:SilentSendToReloadedRepl(eval)
+  if s:AllNs("reloaded.repl") == []
+    echoerr "vim-cljreloaded requires reloaded.repl >= \"0.2.3\" in order to use reloaded workflow functions."
+  else
+    call fireplace#session_eval(a:eval, {"ns": s:cljreloaded_dev_ns})
+  endif
+endfunction
+
+if !exists('s:cljreloaded_dev_ns')
+  let ns = fireplace#eval("
+                \  (try
+                \    (do (in-ns 'dev) (clojure.core/use 'clojure.core) (use 'dev) \"dev\")
+                \    (catch Exception e (do (in-ns 'user) \"user\")))")
+
+  let s:cljreloaded_dev_ns = substitute(ns, "\"", "", "g")
+  echomsg s:cljreloaded_dev_ns
+endif
+
+function! s:InNs(ns)
+  let s:cljreloaded_dev_ns = a:ns
+  call s:SendToRepl("(in-ns '".a:ns.")")
+endfunction
+
+function! s:UseNs(ns)
+  call s:SendToRepl("(use '".a:ns.")")
 endfunction
 
 function! s:AllAvailableJars(term)
   let eval = "
               \ (let [jars (map #(str (first %1) \" \" (str \"\\\"\" (second %1) \"\\\"\")) @cljreloaded-jars)]
               \   (vec (filter #(clojure.string/starts-with? %1 \"".a:term."\") jars)))"
-  return s:ToList(fireplace#session_eval(eval, {"ns": b:cljreloaded_dev_ns}))
+  return s:ToList(fireplace#session_eval(eval, {"ns": s:cljreloaded_dev_ns}))
 endfunction
 
 function! s:NonSnapshotJars(term)
   let eval = "
               \ (let [jars (map #(str (first %1) \" \" (str \"\\\"\" (second %1) \"\\\"\")) @cljreloaded-jars)]
               \   (vec (filter #(and (clojure.string/starts-with? %1 \"".a:term."\") (not (re-find #\"SNAPSHOT\" %1))) jars)))"
-  return s:ToList(fireplace#session_eval(eval, {"ns": b:cljreloaded_dev_ns}))
+  return s:ToList(fireplace#session_eval(eval, {"ns": s:cljreloaded_dev_ns}))
 endfunction
 
 function! s:LoadAvailableJars(silent)
@@ -75,44 +99,49 @@ function! s:LoadAvailableJars(silent)
     \            (reset! cljreloaded-jars (distinct jars))))"
 
   if a:silent
-    call s:SilentReloadedFunc(s:clojarsJarsDownload)
+    call s:SilentSendToRepl(s:clojarsJarsDownload)
   else
-    call s:ReloadedFunc(s:clojarsJarsDownload)
+    call s:SendToRepl(s:clojarsJarsDownload)
   endif
 endfunction
 
+function! s:System()
+  let evalString = "(require '[clojure.pprint :refer [pprint]]) (pprint system)"
+  call s:SendToReloadedRepl(evalString)
+endfunction
+
 function! s:Reset()
-  call s:ReloadedFunc("(reset)")
+  call s:SendToReloadedRepl("(reset)")
 endfunction
 
 function! s:ResetAll()
-  call s:ReloadedFunc("(reset-all)")
+  call s:SendToReloadedRepl("(reset-all)")
 endfunction
 
 function! s:Init()
-  call s:ReloadedFunc("(init)")
+  call s:SendToReloadedRepl("(init)")
 endfunction
 
 function! s:Start()
-  call s:ReloadedFunc("(start)")
+  call s:SendToReloadedRepl("(start)")
 endfunction
 
 function! s:Stop()
-  call s:ReloadedFunc("(stop)")
+  call s:SendToReloadedRepl("(stop)")
 endfunction
 
 function! s:Go()
-  call s:ReloadedFunc("(go)")
+  call s:SendToReloadedRepl("(go)")
 endfunction
 
 function! s:Refresh()
   let evalString = "(require '[clojure.tools.namespace.repl :refer [refresh]])(refresh)"
-  call s:ReloadedFunc(evalString)
+  call s:SendToReloadedRepl(evalString)
 endfunction
 
 function! s:RefreshAll()
   let evalString = "(require '[clojure.tools.namespace.repl :refer [refresh-all]])(refresh-all)"
-  call s:ReloadedFunc(evalString)
+  call s:SendToReloadedRepl(evalString)
 endfunction
 
 function! s:HotLoadDependency(dependency)
@@ -125,7 +154,7 @@ function! s:HotLoadDependency(dependency)
                       \   :coordinates '[[".a:dependency."]]
                       \   :repositories (merge cemerick.pomegranate.aether/maven-central
                       \                 {\"clojars\" \"http://clojars.org/repo\"}))"
-    call s:ReloadedFunc(evalString)
+    call s:SendToRepl(evalString)
   endif
 endfunction
 
