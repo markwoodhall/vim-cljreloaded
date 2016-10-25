@@ -5,6 +5,7 @@ endif
 let g:loaded_cljreloaded = 1
 let g:cljreloaded_queryclojars = 1
 let g:cljreloaded_clojarsurl = "http://clojars.org/repo/all-jars.clj"
+let g:cljreloaded_lasthotload = ""
 
 if !exists("*fireplace#eval")
   echoerr "vim-cljreloaded requires the vim-fireplace plugin but it is not currently loaded or installed."
@@ -66,7 +67,6 @@ if !exists('s:cljreloaded_dev_ns')
                 \    (catch Exception e (do (in-ns 'user) \"user\")))")
 
   let s:cljreloaded_dev_ns = substitute(ns, "\"", "", "g")
-  echomsg s:cljreloaded_dev_ns
 endif
 
 function! s:InNs(ns)
@@ -154,6 +154,7 @@ function! s:HotLoadDependency(dependency)
                       \   :coordinates '[[".a:dependency."]]
                       \   :repositories (merge cemerick.pomegranate.aether/maven-central
                       \                 {\"clojars\" \"http://clojars.org/repo\"}))"
+    let g:cljreloaded_lasthotload = "[".a:dependency."]"
     call s:SendToRepl(evalString)
   endif
 endfunction
