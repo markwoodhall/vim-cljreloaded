@@ -129,7 +129,21 @@ of jars from [Clojars](https://clojars.org/).
 Hot load a specified dependency into a running nREPL session. Supports selection of the dependency using a list
 of jars from [Clojars](https://clojars.org/) as a source for the [fzf.vim selector](https://github.com/junegunn/fzf.vim).
 
-![Hot load example](http://i.imgur.com/KCXlGk0.png)
+![Hot load example](http://i.imgur.com/zjtWxHT.png)
+
+In the above example I had the following mapping in place.
+
+Use Fzf to find a dependency from Clojars.
+
+```vim
+autocmd filetype clojure nnoremap <buffer> fid :ReloadedHotLoadDepFzf<CR>
+```
+
+Use the exrpession register to put the value of the last loaded dependency into the buffer.
+
+```vim
+autocmd filetype clojure nnoremap <buffer> pud "=g:cljreloaded_lasthotload<C-M>p
+```
 
 ### `:ReloadedHotLoadDepNoSnapshotsFzf`
 
