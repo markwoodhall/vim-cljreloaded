@@ -105,7 +105,7 @@ currently available on the classpath.
 
 ![Use ns example](http://i.imgur.com/SZepWw6.png)
 
-### `:ReloadedHotLoadDependencyUnderCursor`
+### `:ReloadedHotLoadDepUnderCursor`
 
 vim-cljreloaded can hot load dependencies into a running nREPL session using [pomegranate](https://github.com/cemerick/pomegranate).
 
@@ -129,27 +129,23 @@ of jars from [Clojars](https://clojars.org/).
 Hot load a specified dependency into a running nREPL session. Supports selection of the dependency using a list
 of jars from [Clojars](https://clojars.org/) as a source for the [fzf.vim selector](https://github.com/junegunn/fzf.vim).
 
-![Hot load example](http://i.imgur.com/zjtWxHT.png)
+![Hot load example](http://i.imgur.com/VNRpPpp.png)
 
-In the above example I had the following mapping in place.
+Note. This works best when your cursor is positioned on the closing square bracket of the `:dependencies` value.
 
-Use Fzf to find a dependency from Clojars.
+### `:ReloadedHotLoadDepSilentFzf`
 
-```vim
-autocmd filetype clojure nnoremap <buffer> fid :ReloadedHotLoadDepFzf<CR>
-```
-
-Use the exrpession register to put the value of the last loaded dependency into the buffer.
-
-```vim
-autocmd filetype clojure nnoremap <buffer> pud "=g:cljreloaded_lasthotload<C-M>p
-```
+This is the same as above but it will not output anything to the current buffer.
 
 ### `:ReloadedHotLoadDepNoSnapshotsFzf`
 
 This is the same as `:ReloadedHotLoadDepFzf` but `SNAPSHOT` jars are automatically filtered out.
 
-![Hot load example](http://i.imgur.com/k8mgV1g.png)
+![Hot load example](http://i.imgur.com/gYPPmZY.png)
+
+### `:ReloadedHotLoadDepNoSnapshotSilentFzf`
+
+This is the same as above but it will not output anything to the current buffer.
 
 ### Notes about hot loading and completion
 

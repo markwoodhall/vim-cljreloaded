@@ -159,7 +159,7 @@ function! s:HotLoadDependency(dependency)
   endif
 endfunction
 
-function! s:HotLoadDependencyUnderCursor()
+function! s:HotLoadDepUnderCursor()
     let cursorPos = getpos('.')
     call search(']')
     let endCursorPos = getpos('.')
@@ -185,14 +185,18 @@ endfunction
 
 function! s:DependencyCompleteFzfSink(str) abort
   call s:HotLoadDependency(a:str)
+  if s:dump
+    execute "normal! i\<CR>\<esc>\"=g:cljreloaded_lasthotload\<C-M>p"
+  endif
 endfunction
 
-function! s:DependencyCompleteFzf(actions) abort
+function! s:DependencyCompleteFzf(actions, dump) abort
   if !exists("*fzf#run")
     echoerr "DependencyCompleteFzf requires the fzf.vim plugin."
     finish
   endif
   let s:actions = a:actions
+  let s:dump = a:dump
   if empty(s:actions)
     echo 'No jars found, it can take a minute or two to download completions or you might need to let g:cljreloaded_queryclojars = 1'
     return
@@ -216,9 +220,11 @@ autocmd FileType clojure command! -buffer ReloadedStop :exe s:Stop()
 autocmd FileType clojure command! -buffer ReloadedGo :exe s:Go()
 autocmd FileType clojure command! -buffer ReloadedRefresh :exe s:Refresh()
 autocmd FileType clojure command! -buffer ReloadedRefreshAll :exe s:RefreshAll()
-autocmd FileType clojure command! -buffer ReloadedHotLoadDepFzf :exe s:DependencyCompleteFzf(s:AllAvailableJars(''))
-autocmd FileType clojure command! -buffer ReloadedHotLoadDepNoSnapshotsFzf :exe s:DependencyCompleteFzf(s:NonSnapshotJars(''))
-autocmd FileType clojure command! -buffer ReloadedHotLoadDependencyUnderCursor :exe s:HotLoadDependencyUnderCursor()
+autocmd FileType clojure command! -buffer ReloadedHotLoadDepFzf :exe s:DependencyCompleteFzf(s:AllAvailableJars(''), 1)
+autocmd FileType clojure command! -buffer ReloadedHotLoadDepSilentFzf :exe s:DependencyCompleteFzf(s:AllAvailableJars(''), 0)
+autocmd FileType clojure command! -buffer ReloadedHotLoadDepNoSnapshotsFzf :exe s:DependencyCompleteFzf(s:NonSnapshotJars(''), 1)
+autocmd FileType clojure command! -buffer ReloadedHotLoadDepNoSnapshotsSilentFzf :exe s:DependencyCompleteFzf(s:NonSnapshotJars(''), 0)
+autocmd FileType clojure command! -buffer ReloadedHotLoadDepUnderCursor :exe s:HotLoadDepUnderCursor()
 autocmd FileType clojure command! -buffer ReloadedLoadAvailableJars :exe s:LoadAvailableJars(0)
 
 if g:cljreloaded_queryclojars
