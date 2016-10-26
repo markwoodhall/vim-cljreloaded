@@ -103,7 +103,7 @@ currently available on the classpath.
 Calls `(use '$namespace)` in the underlying nREPL session. Supports tab completion on the namespace using namespaces
 currently available on the classpath.
 
-![Use ns example](http://i.imgur.com/UxIM1NF.png)
+![Use ns example](http://i.imgur.com/SZepWw6.png)
 
 ### `:ReloadedHotLoadDependencyUnderCursor`
 
