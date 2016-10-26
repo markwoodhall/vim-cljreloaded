@@ -8,6 +8,10 @@ For hot loading dependencies this plugin makes use of [cemerick.pomegranate](htt
 
 You can add these as dependencies using a `:dev` profile in `project.clj` or by adding them to `~/.lein/profiles.clj`.
 
+Note. There is no hard requirement to use [reloaded.repl](https://github.com/weavejester/reloaded.repl) and/or [cemerick.pomegranate](https://github.com/cemerick/pomegranate)
+but certain functionality requires it. If you try to use some of this functionality without those dependencies being available you should get
+an error message indicating what is required.
+
 ## Installation
 
 Install using your favourite plugin manager,
