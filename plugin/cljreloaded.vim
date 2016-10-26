@@ -207,6 +207,31 @@ function! s:DependencyCompleteFzf(actions, dump) abort
   \ 'sink': function('s:DependencyCompleteFzfSink')})
 endfunction
 
+function! s:NsCompleteFzfSink(str) abort
+  if s:action == "use"
+    call s:UseNs(a:str)
+  else
+    call s:InNs(a:str)
+  endif
+endfunction
+
+function! s:NsCompleteFzf(actions, action) abort
+  if !exists("*fzf#run")
+    echoerr "NsCompleteFzf requires the fzf.vim plugin."
+    finish
+  endif
+  let s:actions = a:actions
+  let s:action = a:action
+  if empty(s:actions)
+    echo 'No namespaces found, clojure.tools.namespace may not be avilable.'
+    return
+  endif
+  call fzf#run({
+  \ 'source': s:actions,
+  \ 'down': '40%',
+  \ 'sink': function('s:NsCompleteFzfSink')})
+endfunction
+
 autocmd FileType clojure command! -nargs=1 -complete=customlist,s:NsComplete -buffer ReloadedInNs :exe s:InNs(<q-args>)
 autocmd FileType clojure command! -nargs=1 -complete=customlist,s:NsComplete -buffer ReloadedUseNs :exe s:UseNs(<q-args>)
 autocmd FileType clojure command! -nargs=1 -complete=customlist,s:DependencyComplete -buffer ReloadedHotLoadDep :exe s:HotLoadDependency(<q-args>)
@@ -220,6 +245,8 @@ autocmd FileType clojure command! -buffer ReloadedStop :exe s:Stop()
 autocmd FileType clojure command! -buffer ReloadedGo :exe s:Go()
 autocmd FileType clojure command! -buffer ReloadedRefresh :exe s:Refresh()
 autocmd FileType clojure command! -buffer ReloadedRefreshAll :exe s:RefreshAll()
+autocmd FileType clojure command! -buffer ReloadedUseNsFzf :exe s:NsCompleteFzf(s:AllNs(''), 'use')
+autocmd FileType clojure command! -buffer ReloadedInNsFzf :exe s:NsCompleteFzf(s:AllNs(''), 'in')
 autocmd FileType clojure command! -buffer ReloadedHotLoadDepFzf :exe s:DependencyCompleteFzf(s:AllAvailableJars(''), 1)
 autocmd FileType clojure command! -buffer ReloadedHotLoadDepSilentFzf :exe s:DependencyCompleteFzf(s:AllAvailableJars(''), 0)
 autocmd FileType clojure command! -buffer ReloadedHotLoadDepNoSnapshotsFzf :exe s:DependencyCompleteFzf(s:NonSnapshotJars(''), 1)

@@ -103,11 +103,23 @@ currently available on the classpath.
 
 ![In ns example](http://i.imgur.com/NP4zckP.png)
 
+### `:ReloadedInNsFzf`
+Changes `*ns*` in the underlying nREPL session to be `$namespace`. Supports selection of the namespace using a list of available namespaces on the
+classpath as a source for the [fzf.vim selector](https://github.com/junegunn/fzf.vim).
+
+![In ns example](http://i.imgur.com/NutK0fZ.png)
+
 ### `:ReloadedUseNs`
 Calls `(use '$namespace)` in the underlying nREPL session. Supports tab completion on the namespace using namespaces
 currently available on the classpath.
 
 ![Use ns example](http://i.imgur.com/SZepWw6.png)
+
+### `:ReloadedUseNsFzf`
+Calls `(use '$namespace)` in the underlying nREPL session. Supports selection of the namespace using a list of available namepaces on the
+classpath as a source for the
+
+![Use ns example](http://i.imgur.com/JhNd4wi.png)
 
 ### `:ReloadedHotLoadDepUnderCursor`
 
