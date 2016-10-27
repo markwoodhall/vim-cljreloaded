@@ -22,8 +22,18 @@ function! s:SilentSendToRepl(eval)
 endfunction
 
 function! s:ToList(input)
-  let parsed = substitute(a:input, "\" \"", "\", \"", "g")
+  let parsed = substitute(a:input, " \\.\\.\\.", "", "g")
+  let parsed = substitute(parsed, "\" \"", "\", \"", "g")
   return eval(parsed)
+endfunction
+
+function! s:LargeOutputFromRepl(eval)
+  let plength = fireplace#session_eval("*print-length*",{"ns": s:cljreloaded_dev_ns})
+  call fireplace#session_eval("(set! *print-length* nil)",{"ns": s:cljreloaded_dev_ns})
+
+  let out = fireplace#session_eval(a:eval, {"ns": s:cljreloaded_dev_ns})
+  call fireplace#session_eval("(set! *print-length* ".plength.")",{"ns": s:cljreloaded_dev_ns})
+  return out
 endfunction
 
 function! s:AllNs(term)
@@ -37,7 +47,8 @@ function! s:AllNs(term)
     let eval = "
               \ (let [namespaces (map str (find-namespaces-on-classpath))]
               \   (vec (filter #(clojure.string/starts-with? %1 \"".a:term."\") namespaces)))"
-    return s:ToList(fireplace#eval(eval))
+    let allNs = s:LargeOutputFromRepl(eval)
+    return s:ToList(allNs)
   else
     echoerr "vim-cljreloaded requires org.clojure/tools.namespace >= \"0.2.11\" in order to inspect namespaces."
   endif
@@ -78,11 +89,14 @@ function! s:UseNs(ns)
   call s:SendToRepl("(use '".a:ns.")")
 endfunction
 
-function! s:AllAvailableJars(term)
+function! s:AllAvailableJars(term) abort
   let eval = "
-              \ (let [jars (map #(str (first %1) \" \" (str \"\\\"\" (second %1) \"\\\"\")) @cljreloaded-jars)]
-              \   (vec (filter #(clojure.string/starts-with? %1 \"".a:term."\") jars)))"
-  return s:ToList(fireplace#session_eval(eval, {"ns": s:cljreloaded_dev_ns}))
+              \ (let [jars (map #(str (first %1) \" \" (str \"\\\"\" (second %1) \"\\\"\")) @cljreloaded-jars)
+              \       jars (vec (filter #(clojure.string/starts-with? %1 \"".a:term."\") jars))]
+              \       jars)"
+
+  let jars = s:LargeOutputFromRepl(eval)
+  return s:ToList(jars)
 endfunction
 
 function! s:NonSnapshotJars(term)
@@ -94,9 +108,10 @@ endfunction
 
 function! s:LoadAvailableJars(silent)
   let s:clojarsJarsDownload = "
-    \  (def cljreloaded-jars (atom []))
-    \  (future (let [jars (read-string (str \"[\" (slurp \"".g:cljreloaded_clojarsurl."\") \"]\"))]
-    \            (reset! cljreloaded-jars (distinct jars))))"
+    \  (defonce cljreloaded-jars (atom []))
+    \  (future (try (let [jars (read-string (str \"[\" (slurp \"".g:cljreloaded_clojarsurl."\") \"]\"))]
+    \                 (reset! cljreloaded-jars (distinct jars)))
+    \            (catch Exception e (reset! cljreloaded-jars []))))"
 
   if a:silent
     call s:SilentSendToRepl(s:clojarsJarsDownload)
