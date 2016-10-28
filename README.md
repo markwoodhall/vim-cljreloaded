@@ -206,6 +206,8 @@ With the default settings the following bindings are available.
   crds :ReloadedHotLoadDepSilentFzf
   crdp :ReloadedHotLoadDepFzf
 
+
+  crn  :ReloadedNsFzf
   crun :ReloadedUseNsFzf
   crin :ReloadedInNsFzf
   crrn :ReloadedRequireNsFzf
