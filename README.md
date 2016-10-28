@@ -163,6 +163,22 @@ This is the same as `:ReloadedHotLoadDepFzf` but `SNAPSHOT` jars are automatical
 
 This is the same as above but it will not output anything to the current buffer.
 
+### `:ReloadedNsPublicsFzf`
+
+This gets the result of calling `(ns-publics $namepace)` and uses them as a source
+for the [fzf.vim selector](https://github.com/junegunn/fzf.vim). When selecting an option then `(doc $option)`
+is shown.
+
+![Publics example](http://i.imgur.com/DGVTTYg.png)
+
+### `:ReloadedNsFzf`
+
+This uses the list of namespaces available on the classpath as a source
+for the [fzf.vim selector](https://github.com/junegunn/fzf.vim) when selecting an option then `(doc $option)`
+is shown.
+
+![Ns list example](http://i.imgur.com/lAZ2uCM.png)
+
 ### Notes about hot loading and completion
 
 It is worth pointing out that as it currently stands any command that hot loads a dependency will block until the dependency and all its requirements have downloaded.

@@ -22,7 +22,7 @@ function! s:SilentSendToRepl(eval)
 endfunction
 
 function! s:ToList(input)
-  let parsed = substitute(a:input, " \\.\\.\\.", "", "g")
+  let parsed = substitute(a:input, " \\.\\.\\. )", ")", "g")
   let parsed = substitute(parsed, "\" \"", "\", \"", "g")
   return eval(parsed)
 endfunction
@@ -85,8 +85,19 @@ function! s:InNs(ns)
   call s:SendToRepl("(in-ns '".a:ns.")")
 endfunction
 
+function! s:RequireNs(ns)
+  call s:SendToRepl("(require ['".a:ns."])")
+endfunction
+
 function! s:UseNs(ns)
   call s:SendToRepl("(use '".a:ns.")")
+endfunction
+
+function! s:AllNsPublics(ns)
+  silent call s:RequireNs(a:ns)
+  let eval = "(vec (map #(clojure.string/replace (str %1) \"#'\" \"\") (vals (ns-publics '".a:ns."))))"
+  let allPublics = s:LargeOutputFromRepl(eval)
+  return s:ToList(allPublics)
 endfunction
 
 function! s:AllAvailableJars(term) abort
@@ -225,6 +236,13 @@ endfunction
 function! s:NsCompleteFzfSink(str) abort
   if s:action == "use"
     call s:UseNs(a:str)
+  elseif s:action == "require"
+    call s:RequireNs(a:str)
+  elseif s:action == "ns"
+    silent call s:RequireNs(a:str)
+    call s:SilentSendToRepl("(doc ".a:str.")")
+  elseif s:action == "publics"
+    call s:SilentSendToRepl("(doc ".a:str.")")
   else
     call s:InNs(a:str)
   endif
@@ -247,9 +265,11 @@ function! s:NsCompleteFzf(actions, action) abort
   \ 'sink': function('s:NsCompleteFzfSink')})
 endfunction
 
+autocmd FileType clojure command! -nargs=1 -complete=customlist,s:NsComplete -buffer ReloadedRequireNs :exe s:RequireNs(<q-args>)
 autocmd FileType clojure command! -nargs=1 -complete=customlist,s:NsComplete -buffer ReloadedInNs :exe s:InNs(<q-args>)
 autocmd FileType clojure command! -nargs=1 -complete=customlist,s:NsComplete -buffer ReloadedUseNs :exe s:UseNs(<q-args>)
 autocmd FileType clojure command! -nargs=1 -complete=customlist,s:DependencyComplete -buffer ReloadedHotLoadDep :exe s:HotLoadDependency(<q-args>)
+autocmd FileType clojure command! -nargs=1 -complete=customlist,s:NsComplete -buffer ReloadedNsPublicsFzf :exe s:NsCompleteFzf(s:AllNsPublics(<q-args>), 'publics')
 
 autocmd FileType clojure command! -buffer ReloadedSystem :exe s:System()
 autocmd FileType clojure command! -buffer ReloadedReset :exe s:Reset()
@@ -262,6 +282,8 @@ autocmd FileType clojure command! -buffer ReloadedRefresh :exe s:Refresh()
 autocmd FileType clojure command! -buffer ReloadedRefreshAll :exe s:RefreshAll()
 autocmd FileType clojure command! -buffer ReloadedUseNsFzf :exe s:NsCompleteFzf(s:AllNs(''), 'use')
 autocmd FileType clojure command! -buffer ReloadedInNsFzf :exe s:NsCompleteFzf(s:AllNs(''), 'in')
+autocmd FileType clojure command! -buffer ReloadedNsFzf :exe s:NsCompleteFzf(s:AllNs(''), 'ns')
+autocmd FileType clojure command! -buffer ReloadedRequireNsFzf :exe s:NsCompleteFzf(s:AllNs(''), 'require')
 autocmd FileType clojure command! -buffer ReloadedHotLoadDepFzf :exe s:DependencyCompleteFzf(s:AllAvailableJars(''), 1)
 autocmd FileType clojure command! -buffer ReloadedHotLoadDepSilentFzf :exe s:DependencyCompleteFzf(s:AllAvailableJars(''), 0)
 autocmd FileType clojure command! -buffer ReloadedHotLoadDepNoSnapshotsFzf :exe s:DependencyCompleteFzf(s:NonSnapshotJars(''), 1)
