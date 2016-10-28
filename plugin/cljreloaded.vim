@@ -242,7 +242,13 @@ function! s:NsCompleteFzfSink(str) abort
     call s:RequireNs(a:str)
   elseif s:action == "ns"
     silent call s:RequireNs(a:str)
-    call s:SilentSendToRepl("(doc ".a:str.")")
+    let s:actions = s:AllNsPublics(a:str)
+    let s:action = "publics"
+    call fzf#run({
+    \ 'source': s:actions,
+    \ 'down': '40%',
+    \ 'sink': function('s:NsCompleteFzfSink')})
+    call feedkeys("i")
   elseif s:action == "publics"
     call s:SilentSendToRepl("(doc ".a:str.")")
   else
@@ -308,6 +314,7 @@ if g:cljreloaded_setbindings
   execute "autocmd filetype clojure nnoremap <buffer> ".g:cljreloaded_bindingprefix."ds :ReloadedHotLoadDepSilentFzf<CR>"
   execute "autocmd filetype clojure nnoremap <buffer> ".g:cljreloaded_bindingprefix."dp :ReloadedHotLoadDepFzf<CR>"
 
+  execute "autocmd filetype clojure nnoremap <buffer> ".g:cljreloaded_bindingprefix."n :ReloadedNsFzf<CR>"
   execute "autocmd filetype clojure nnoremap <buffer> ".g:cljreloaded_bindingprefix."un :ReloadedUseNsFzf<CR>"
   execute "autocmd filetype clojure nnoremap <buffer> ".g:cljreloaded_bindingprefix."in :ReloadedInNsFzf<CR>"
   execute "autocmd filetype clojure nnoremap <buffer> ".g:cljreloaded_bindingprefix."rn :ReloadedRequireNsFzf<CR>"
