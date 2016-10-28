@@ -3,6 +3,8 @@ if exists('g:loaded_cljreloaded') || &cp
 endif
 
 let g:loaded_cljreloaded = 1
+let g:cljreloaded_setbindings = 1
+let g:cljreloaded_bindingprefix = "cr"
 let g:cljreloaded_queryclojars = 1
 let g:cljreloaded_clojarsurl = "http://clojars.org/repo/all-jars.clj"
 let g:cljreloaded_lasthotload = ""
@@ -42,7 +44,7 @@ function! s:AllNs(term)
               \   (use '[clojure.tools.namespace :only [find-namespaces-on-classpath]])
               \   (catch Exception error []))"
 
-  let exists = fireplace#eval(eval)
+  let exists = s:SendToRepl(eval)
   if exists == "nil"
     let eval = "
               \ (let [namespaces (map str (find-namespaces-on-classpath))]
@@ -293,4 +295,20 @@ autocmd FileType clojure command! -buffer ReloadedLoadAvailableJars :exe s:LoadA
 
 if g:cljreloaded_queryclojars
   call s:LoadAvailableJars(1)
+endif
+
+if g:cljreloaded_setbindings
+  execute "autocmd filetype clojure nnoremap <buffer> ".g:cljreloaded_bindingprefix."g :ReloadedGo<CR>"
+  execute "autocmd filetype clojure nnoremap <buffer> ".g:cljreloaded_bindingprefix."s :ReloadedStart<CR>"
+  execute "autocmd filetype clojure nnoremap <buffer> ".g:cljreloaded_bindingprefix."q :ReloadedStop<CR>"
+  execute "autocmd filetype clojure nnoremap <buffer> ".g:cljreloaded_bindingprefix."r :ReloadedReset<CR>"
+  execute "autocmd filetype clojure nnoremap <buffer> ".g:cljreloaded_bindingprefix."ra :ReloadedResetAll<CR>"
+
+  execute "autocmd filetype clojure nnoremap <buffer> ".g:cljreloaded_bindingprefix."d :ReloadedHotLoadDepUnderCursor<CR>"
+  execute "autocmd filetype clojure nnoremap <buffer> ".g:cljreloaded_bindingprefix."ds :ReloadedHotLoadDepSilentFzf<CR>"
+  execute "autocmd filetype clojure nnoremap <buffer> ".g:cljreloaded_bindingprefix."dp :ReloadedHotLoadDepFzf<CR>"
+
+  execute "autocmd filetype clojure nnoremap <buffer> ".g:cljreloaded_bindingprefix."un :ReloadedUseNsFzf<CR>"
+  execute "autocmd filetype clojure nnoremap <buffer> ".g:cljreloaded_bindingprefix."in :ReloadedInNsFzf<CR>"
+  execute "autocmd filetype clojure nnoremap <buffer> ".g:cljreloaded_bindingprefix."rn :ReloadedRequireNsFzf<CR>"
 endif

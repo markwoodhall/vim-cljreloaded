@@ -179,6 +179,38 @@ is shown.
 
 ![Ns list example](http://i.imgur.com/lAZ2uCM.png)
 
+### Bindings
+
+There are some keybindings setup by default that try to make things easy, if you wish to disable them you can do.
+
+```vim
+let g:cljreloaded_setbindings = 0
+```
+
+The default prefix for bindings is `cr`, you can change this like so.
+
+```vim
+let g:cljreloaded_bindingprefix = "rr"
+```
+
+With the default settings the following bindings are available.
+
+```
+  crg  :ReloadedGo
+  crs  :ReloadedStart
+  crq  :ReloadedStop
+  crr  :ReloadedReset
+  crra :ReloadedResetAll
+
+  crd  :ReloadedHotLoadDepUnderCursor
+  crds :ReloadedHotLoadDepSilentFzf
+  crdp :ReloadedHotLoadDepFzf
+
+  crun :ReloadedUseNsFzf
+  crin :ReloadedInNsFzf
+  crrn :ReloadedRequireNsFzf
+```
+
 ### Notes about hot loading and completion
 
 It is worth pointing out that as it currently stands any command that hot loads a dependency will block until the dependency and all its requirements have downloaded.
