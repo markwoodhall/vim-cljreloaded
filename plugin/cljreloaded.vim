@@ -47,7 +47,7 @@ function! s:AllNs(term)
   let exists = s:SendToRepl(eval)
   if exists == "nil"
     let eval = "
-              \ (let [namespaces (map str (find-namespaces-on-classpath))]
+              \ (let [namespaces (distinct (concat (map str (all-ns)) (map str (find-namespaces-on-classpath))))]
               \   (vec (filter #(clojure.string/starts-with? %1 \"".a:term."\") namespaces)))"
     let allNs = s:LargeOutputFromRepl(eval)
     return s:ToList(allNs)
