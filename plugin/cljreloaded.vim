@@ -20,7 +20,8 @@ function! s:SendToRepl(eval)
 endfunction
 
 function! s:SilentSendToRepl(eval)
-  call fireplace#session_eval(a:eval, {"ns": s:cljreloaded_dev_ns})
+  let output = fireplace#session_eval(a:eval, {"ns": s:cljreloaded_dev_ns})
+  return output
 endfunction
 
 function! s:ToList(input)
@@ -42,10 +43,11 @@ function! s:AllNs(term)
   let eval = "
               \ (try
               \   (use '[clojure.tools.namespace :only [find-namespaces-on-classpath]])
-              \   (catch Exception error []))"
+              \    1
+              \   (catch Exception error 0))"
 
-  let exists = s:SendToRepl(eval)
-  if exists == "nil"
+  let exists = s:SilentSendToRepl(eval)
+  if exists
     let eval = "
               \ (let [namespaces (distinct (concat (map str (all-ns)) (map str (find-namespaces-on-classpath))))]
               \   (vec (filter #(clojure.string/starts-with? %1 \"".a:term."\") namespaces)))"
@@ -250,7 +252,7 @@ function! s:NsCompleteFzfSink(str) abort
     \ 'sink': function('s:NsCompleteFzfSink')})
     call feedkeys("i")
   elseif s:action == "publics"
-    call s:SilentSendToRepl("(doc ".a:str.")")
+    call s:SilentSendToRepl("(clojure.repl/doc ".a:str.")")
   else
     call s:InNs(a:str)
   endif
