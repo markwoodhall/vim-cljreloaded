@@ -123,7 +123,8 @@ endfunction
 function! s:LoadAvailableJars(silent)
   let s:clojarsJarsDownload = "
     \  (defonce cljreloaded-jars (atom []))
-    \  (future (try (let [jars (read-string (str \"[\" (slurp \"".g:cljreloaded_clojarsurl."\") \"]\"))]
+    \  (require '[clojure.edn :as edn])
+    \  (future (try (let [jars (edn/read-string (str \"[\" (slurp \"".g:cljreloaded_clojarsurl."\") \"]\"))]
     \                 (reset! cljreloaded-jars (distinct jars)))
     \            (catch Exception e (reset! cljreloaded-jars []))))"
 
