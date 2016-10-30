@@ -6,8 +6,11 @@ let g:loaded_cljreloaded = 1
 let g:cljreloaded_setbindings = 1
 let g:cljreloaded_bindingprefix = "cr"
 let g:cljreloaded_queryclojars = 1
+let g:cljreloaded_queriedclojars = 0
 let g:cljreloaded_clojarsurl = "http://clojars.org/repo/all-jars.clj"
 let g:cljreloaded_lasthotload = ""
+
+let s:cljreloaded_dev_ns = "user"
 
 if !exists("*fireplace#eval")
   echoerr "vim-cljreloaded requires the vim-fireplace plugin but it is not currently loaded or installed."
@@ -75,15 +78,6 @@ function! s:SilentSendToReloadedRepl(eval)
   endif
 endfunction
 
-if !exists('s:cljreloaded_dev_ns')
-  let ns = fireplace#eval("
-                \  (try
-                \    (do (in-ns 'dev) (clojure.core/use 'clojure.core) (use 'dev) \"dev\")
-                \    (catch Exception e (do (in-ns 'user) \"user\")))")
-
-  let s:cljreloaded_dev_ns = substitute(ns, "\"", "", "g")
-endif
-
 function! s:InNs(ns)
   let s:cljreloaded_dev_ns = a:ns
   call s:SendToRepl("(in-ns '".a:ns.")")
@@ -105,6 +99,11 @@ function! s:AllNsPublics(ns)
 endfunction
 
 function! s:AllAvailableJars(term) abort
+  if !g:cljreloaded_queriedclojars
+    echomsg "No data has been loaded from Clojars. This might be because there was no active REPL connection when the plugin loaded.
+            \ Data will be begin downloading in the background. Try the command again in a moment."
+    call s:LoadAvailableJars(1)
+  endif
   let eval = "
               \ (let [jars (map #(str (first %1) \" \" (str \"\\\"\" (second %1) \"\\\"\")) @cljreloaded-jars)
               \       jars (vec (filter #(clojure.string/starts-with? %1 \"".a:term."\") jars))]
@@ -133,6 +132,7 @@ function! s:LoadAvailableJars(silent)
   else
     call s:SendToRepl(s:clojarsJarsDownload)
   endif
+  let g:cljreloaded_queriedclojars = 1
 endfunction
 
 function! s:System()
@@ -301,9 +301,23 @@ autocmd FileType clojure command! -buffer ReloadedHotLoadDepNoSnapshotsSilentFzf
 autocmd FileType clojure command! -buffer ReloadedHotLoadDepUnderCursor :exe s:HotLoadDepUnderCursor()
 autocmd FileType clojure command! -buffer ReloadedLoadAvailableJars :exe s:LoadAvailableJars(0)
 
-if g:cljreloaded_queryclojars
-  call s:LoadAvailableJars(1)
-endif
+try
+  let client = fireplace#platform()
+  if has_key(client, 'connection')
+    let ns = fireplace#eval("
+                  \  (try
+                  \    (do (in-ns 'dev) (clojure.core/use 'clojure.core) (use 'dev) \"dev\")
+                  \    (catch Exception e (do (in-ns 'user) \"user\")))")
+
+    let s:cljreloaded_dev_ns = substitute(ns, "\"", "", "g")
+
+    if g:cljreloaded_queryclojars
+      call s:LoadAvailableJars(1)
+    endif
+  endif
+catch /^Fireplace: :Connect to a REPL/
+endtry
+
 
 if g:cljreloaded_setbindings
   execute "autocmd filetype clojure nnoremap <buffer> ".g:cljreloaded_bindingprefix."g :ReloadedGo<CR>"
