@@ -113,6 +113,22 @@ function! s:AllAvailableJars(term) abort
   return s:ToList(jars)
 endfunction
 
+function! cljreloaded#AllAvailableJars()
+  if !g:cljreloaded_queriedclojars
+    echomsg "No data has been loaded from Clojars. This might be because there was no active REPL connection when the plugin loaded.
+            \ Data will be begin downloading in the background. Try the command again in a moment."
+    call s:LoadAvailableJars(1)
+  endif
+  let eval = "
+              \ (let [jars (map #(str (first %1) \" \" (str \"\\\"\" (second %1) \"\\\"\")) @cljreloaded-jars)
+              \       jars (vec jars)]
+              \       jars)"
+
+  let jars = s:LargeOutputFromRepl(eval)
+  return s:ToList(jars)
+endfunction
+
+
 function! s:NonSnapshotJars(term)
   let eval = "
               \ (let [jars (map #(str (first %1) \" \" (str \"\\\"\" (second %1) \"\\\"\")) @cljreloaded-jars)]
