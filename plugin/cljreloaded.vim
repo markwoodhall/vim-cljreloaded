@@ -195,13 +195,15 @@ function! s:HotLoadDependency(dependency)
 endfunction
 
 function! s:HotLoadDepUnderCursor()
+    let restorePos = getpos('.')
+    call search('[', 'b')
     let cursorPos = getpos('.')
     call search(']')
     let endCursorPos = getpos('.')
     let line = getline('.')
-    let dep = strpart(line, cursorPos[2]-1, (endCursorPos[2]-1)-(cursorPos[2]-1))
+    let dep = strpart(line, cursorPos[2], (endCursorPos[2]-1)-(cursorPos[2]))
     call s:HotLoadDependency(dep)
-    call setpos('.', cursorPos)
+    call setpos('.', restorePos)
 endfunction
 
 function! s:NsComplete(A, L, P) abort
