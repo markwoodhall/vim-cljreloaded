@@ -25,5 +25,5 @@ class Source(Base):
         titles = [{'word': x,
                    'menu': x,
                    'info': x}
-                   for x in self.vim.call('cljreloaded#AllAvailableJars')]
+                   for x in self.vim.call('cljreloaded#AllAvailableJars', complete_str)]
         return titles
