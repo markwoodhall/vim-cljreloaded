@@ -15,9 +15,13 @@ class Source(Base):
     def gather_candidates(self, context):
 
         complete_str = context['complete_str']
+        filename = self.vim.call('expand', '%')
         line = self.vim.call('getline', '.')
         col = self.vim.call('col', '.')-1
         to_cursor = line[:col]
+
+        if 'project.clj' not in filename and 'build.boot' not in filename:
+            return []
 
         if '[' not in to_cursor:
             return []
