@@ -65,8 +65,7 @@ function! s:SendToReloadedRepl(eval)
   if s:AllNs("reloaded.repl") == []
     echoerr "vim-cljreloaded requires reloaded.repl >= \"0.2.3\" in order to use reloaded workflow functions."
   else
-    let output = fireplace#session_eval(a:eval, {"ns": s:cljreloaded_dev_ns})
-    echo output
+    echo fireplace#session_eval(a:eval, {"ns": s:cljreloaded_dev_ns})
   endif
 endfunction
 
@@ -282,31 +281,31 @@ function! s:NsCompleteFzf(actions, action) abort
   \ 'sink': function('s:NsCompleteFzfSink')})
 endfunction
 
-autocmd FileType clojure command! -nargs=1 -complete=customlist,s:NsComplete -buffer ReloadedRequireNs :exe s:RequireNs(<q-args>)
-autocmd FileType clojure command! -nargs=1 -complete=customlist,s:NsComplete -buffer ReloadedInNs :exe s:InNs(<q-args>)
-autocmd FileType clojure command! -nargs=1 -complete=customlist,s:NsComplete -buffer ReloadedUseNs :exe s:UseNs(<q-args>)
-autocmd FileType clojure command! -nargs=1 -complete=customlist,s:DependencyComplete -buffer ReloadedHotLoadDep :exe s:HotLoadDependency(<q-args>)
-autocmd FileType clojure command! -nargs=1 -complete=customlist,s:NsComplete -buffer ReloadedNsPublicsFzf :exe s:NsCompleteFzf(s:AllNsPublics(<q-args>), 'publics')
+autocmd FileType clojure command! -nargs=1 -complete=customlist,s:NsComplete -buffer ReloadedRequireNs :call s:RequireNs(<q-args>)
+autocmd FileType clojure command! -nargs=1 -complete=customlist,s:NsComplete -buffer ReloadedInNs :call s:InNs(<q-args>)
+autocmd FileType clojure command! -nargs=1 -complete=customlist,s:NsComplete -buffer ReloadedUseNs :call s:UseNs(<q-args>)
+autocmd FileType clojure command! -nargs=1 -complete=customlist,s:DependencyComplete -buffer ReloadedHotLoadDep :call s:HotLoadDependency(<q-args>)
+autocmd FileType clojure command! -nargs=1 -complete=customlist,s:NsComplete -buffer ReloadedNsPublicsFzf :call s:NsCompleteFzf(s:AllNsPublics(<q-args>), 'publics')
 
-autocmd FileType clojure command! -buffer ReloadedSystem :exe s:System()
-autocmd FileType clojure command! -buffer ReloadedReset :exe s:Reset()
-autocmd FileType clojure command! -buffer ReloadedResetAll :exe s:ResetAll()
-autocmd FileType clojure command! -buffer ReloadedInit :exe s:Init()
-autocmd FileType clojure command! -buffer ReloadedStart :exe s:Start()
-autocmd FileType clojure command! -buffer ReloadedStop :exe s:Stop()
-autocmd FileType clojure command! -buffer ReloadedGo :exe s:Go()
-autocmd FileType clojure command! -buffer ReloadedRefresh :exe s:Refresh()
-autocmd FileType clojure command! -buffer ReloadedRefreshAll :exe s:RefreshAll()
-autocmd FileType clojure command! -buffer ReloadedUseNsFzf :exe s:NsCompleteFzf(s:AllNs(''), 'use')
-autocmd FileType clojure command! -buffer ReloadedInNsFzf :exe s:NsCompleteFzf(s:AllNs(''), 'in')
-autocmd FileType clojure command! -buffer ReloadedNsFzf :exe s:NsCompleteFzf(s:AllNs(''), 'ns')
-autocmd FileType clojure command! -buffer ReloadedRequireNsFzf :exe s:NsCompleteFzf(s:AllNs(''), 'require')
-autocmd FileType clojure command! -buffer ReloadedHotLoadDepFzf :exe s:DependencyCompleteFzf(s:AllAvailableJars(''), 1)
-autocmd FileType clojure command! -buffer ReloadedHotLoadDepSilentFzf :exe s:DependencyCompleteFzf(s:AllAvailableJars(''), 0)
-autocmd FileType clojure command! -buffer ReloadedHotLoadDepNoSnapshotsFzf :exe s:DependencyCompleteFzf(s:NonSnapshotJars(''), 1)
-autocmd FileType clojure command! -buffer ReloadedHotLoadDepNoSnapshotsSilentFzf :exe s:DependencyCompleteFzf(s:NonSnapshotJars(''), 0)
-autocmd FileType clojure command! -buffer ReloadedHotLoadDepUnderCursor :exe s:HotLoadDepUnderCursor()
-autocmd FileType clojure command! -buffer ReloadedLoadAvailableJars :exe s:LoadAvailableJars(0)
+autocmd FileType clojure command! -buffer ReloadedSystem :call s:System()
+autocmd FileType clojure command! -buffer ReloadedReset :call s:Reset()
+autocmd FileType clojure command! -buffer ReloadedResetAll :call s:ResetAll()
+autocmd FileType clojure command! -buffer ReloadedInit :call s:Init()
+autocmd FileType clojure command! -buffer ReloadedStart :call s:Start()
+autocmd FileType clojure command! -buffer ReloadedStop :call s:Stop()
+autocmd FileType clojure command! -buffer ReloadedGo :call s:Go()
+autocmd FileType clojure command! -buffer ReloadedRefresh :call s:Refresh()
+autocmd FileType clojure command! -buffer ReloadedRefreshAll :call s:RefreshAll()
+autocmd FileType clojure command! -buffer ReloadedUseNsFzf :call s:NsCompleteFzf(s:AllNs(''), 'use')
+autocmd FileType clojure command! -buffer ReloadedInNsFzf :call s:NsCompleteFzf(s:AllNs(''), 'in')
+autocmd FileType clojure command! -buffer ReloadedNsFzf :call s:NsCompleteFzf(s:AllNs(''), 'ns')
+autocmd FileType clojure command! -buffer ReloadedRequireNsFzf :call s:NsCompleteFzf(s:AllNs(''), 'require')
+autocmd FileType clojure command! -buffer ReloadedHotLoadDepFzf :call s:DependencyCompleteFzf(s:AllAvailableJars(''), 1)
+autocmd FileType clojure command! -buffer ReloadedHotLoadDepSilentFzf :call s:DependencyCompleteFzf(s:AllAvailableJars(''), 0)
+autocmd FileType clojure command! -buffer ReloadedHotLoadDepNoSnapshotsFzf :call s:DependencyCompleteFzf(s:NonSnapshotJars(''), 1)
+autocmd FileType clojure command! -buffer ReloadedHotLoadDepNoSnapshotsSilentFzf :call s:DependencyCompleteFzf(s:NonSnapshotJars(''), 0)
+autocmd FileType clojure command! -buffer ReloadedHotLoadDepUnderCursor :call s:HotLoadDepUnderCursor()
+autocmd FileType clojure command! -buffer ReloadedLoadAvailableJars :call s:LoadAvailableJars(0)
 
 try
   let client = fireplace#platform()
