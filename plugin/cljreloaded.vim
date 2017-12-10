@@ -10,7 +10,7 @@ let g:cljreloaded_queriedclojars = 0
 let g:cljreloaded_clojarsurl = "http://clojars.org/repo/all-jars.clj"
 let g:cljreloaded_lasthotload = ""
 
-let s:cljreloaded_dev_ns = "user"
+let g:cljreloaded_dev_ns = "user"
 
 if !exists("*fireplace#eval")
   echoerr "vim-cljreloaded requires the vim-fireplace plugin but it is not currently loaded or installed."
@@ -18,12 +18,12 @@ if !exists("*fireplace#eval")
 endif
 
 function! s:SendToRepl(eval)
-  let output = fireplace#session_eval(a:eval, {"ns": s:cljreloaded_dev_ns})
+  let output = fireplace#session_eval(a:eval, {"ns": g:cljreloaded_dev_ns})
   echo output
 endfunction
 
 function! s:SilentSendToRepl(eval)
-  let output = fireplace#session_eval(a:eval, {"ns": s:cljreloaded_dev_ns})
+  let output = fireplace#session_eval(a:eval, {"ns": g:cljreloaded_dev_ns})
   return output
 endfunction
 
@@ -34,11 +34,11 @@ function! s:ToList(input)
 endfunction
 
 function! s:LargeOutputFromRepl(eval)
-  let plength = fireplace#session_eval("*print-length*",{"ns": s:cljreloaded_dev_ns})
-  call fireplace#session_eval("(set! *print-length* nil)",{"ns": s:cljreloaded_dev_ns})
+  let plength = fireplace#session_eval("*print-length*",{"ns": g:cljreloaded_dev_ns})
+  call fireplace#session_eval("(set! *print-length* nil)",{"ns": g:cljreloaded_dev_ns})
 
-  let out = fireplace#session_eval(a:eval, {"ns": s:cljreloaded_dev_ns})
-  call fireplace#session_eval("(set! *print-length* ".plength.")",{"ns": s:cljreloaded_dev_ns})
+  let out = fireplace#session_eval(a:eval, {"ns": g:cljreloaded_dev_ns})
+  call fireplace#session_eval("(set! *print-length* ".plength.")",{"ns": g:cljreloaded_dev_ns})
   return out
 endfunction
 
@@ -65,7 +65,7 @@ function! s:SendToReloadedRepl(eval)
   if s:AllNs("reloaded.repl") == []
     echoerr "vim-cljreloaded requires reloaded.repl >= \"0.2.3\" in order to use reloaded workflow functions."
   else
-    echo fireplace#session_eval(a:eval, {"ns": s:cljreloaded_dev_ns})
+    echo fireplace#session_eval(a:eval, {"ns": g:cljreloaded_dev_ns})
   endif
 endfunction
 
@@ -73,12 +73,12 @@ function! s:SilentSendToReloadedRepl(eval)
   if s:AllNs("reloaded.repl") == []
     echoerr "vim-cljreloaded requires reloaded.repl >= \"0.2.3\" in order to use reloaded workflow functions."
   else
-    call fireplace#session_eval(a:eval, {"ns": s:cljreloaded_dev_ns})
+    call fireplace#session_eval(a:eval, {"ns": g:cljreloaded_dev_ns})
   endif
 endfunction
 
 function! s:InNs(ns)
-  let s:cljreloaded_dev_ns = a:ns
+  let g:cljreloaded_dev_ns = a:ns
   call s:SendToRepl("(in-ns '".a:ns.")")
 endfunction
 
@@ -120,7 +120,7 @@ function! s:NonSnapshotJars(term)
   let eval = "
               \ (let [jars (map #(str (first %1) \" \" (str \"\\\"\" (second %1) \"\\\"\")) @cljreloaded-jars)]
               \   (vec (filter #(and (clojure.string/starts-with? %1 \"".a:term."\") (not (re-find #\"SNAPSHOT\" %1))) jars)))"
-  return s:ToList(fireplace#session_eval(eval, {"ns": s:cljreloaded_dev_ns}))
+  return s:ToList(fireplace#session_eval(eval, {"ns": g:cljreloaded_dev_ns}))
 endfunction
 
 function! s:LoadAvailableJars(silent)
@@ -315,7 +315,7 @@ try
                   \    (do (in-ns 'dev) (clojure.core/use 'clojure.core) (use 'dev) \"dev\")
                   \    (catch Exception e (do (in-ns 'user) \"user\")))")
 
-    let s:cljreloaded_dev_ns = substitute(ns, "\"", "", "g")
+    let g:cljreloaded_dev_ns = substitute(ns, "\"", "", "g")
 
     if g:cljreloaded_queryclojars
       call s:LoadAvailableJars(1)
