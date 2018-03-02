@@ -61,22 +61,6 @@ function! s:AllNs(term)
   endif
 endfunction
 
-function! s:SendToReloadedRepl(eval)
-  if s:AllNs("reloaded.repl") == []
-    echoerr "vim-cljreloaded requires reloaded.repl >= \"0.2.3\" in order to use reloaded workflow functions."
-  else
-    echo fireplace#session_eval(a:eval, {"ns": g:cljreloaded_dev_ns})
-  endif
-endfunction
-
-function! s:SilentSendToReloadedRepl(eval)
-  if s:AllNs("reloaded.repl") == []
-    echoerr "vim-cljreloaded requires reloaded.repl >= \"0.2.3\" in order to use reloaded workflow functions."
-  else
-    call fireplace#session_eval(a:eval, {"ns": g:cljreloaded_dev_ns})
-  endif
-endfunction
-
 function! s:InNs(ns)
   let g:cljreloaded_dev_ns = a:ns
   call s:SendToRepl("(in-ns '".a:ns.")")
@@ -141,41 +125,41 @@ endfunction
 
 function! s:System()
   let evalString = "(require '[clojure.pprint :refer [pprint]]) (pprint system)"
-  call s:SendToReloadedRepl(evalString)
+  call s:SendToRepl(evalString)
 endfunction
 
 function! s:Reset()
-  call s:SendToReloadedRepl("(reset)")
+  call s:SendToRepl("(reset)")
 endfunction
 
 function! s:ResetAll()
-  call s:SendToReloadedRepl("(reset-all)")
+  call s:SendToRepl("(reset-all)")
 endfunction
 
 function! s:Init()
-  call s:SendToReloadedRepl("(init)")
+  call s:SendToRepl("(init)")
 endfunction
 
 function! s:Start()
-  call s:SendToReloadedRepl("(start)")
+  call s:SendToRepl("(start)")
 endfunction
 
 function! s:Stop()
-  call s:SendToReloadedRepl("(stop)")
+  call s:SendToRepl("(stop)")
 endfunction
 
 function! s:Go()
-  call s:SendToReloadedRepl("(go)")
+  call s:SendToRepl("(go)")
 endfunction
 
 function! s:Refresh()
   let evalString = "(require '[clojure.tools.namespace.repl :refer [refresh]])(refresh)"
-  call s:SendToReloadedRepl(evalString)
+  call s:SendToRepl(evalString)
 endfunction
 
 function! s:RefreshAll()
   let evalString = "(require '[clojure.tools.namespace.repl :refer [refresh-all]])(refresh-all)"
-  call s:SendToReloadedRepl(evalString)
+  call s:SendToRepl(evalString)
 endfunction
 
 function! s:HotLoadDependency(dependency)
