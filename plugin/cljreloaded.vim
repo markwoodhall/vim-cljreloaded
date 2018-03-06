@@ -6,6 +6,7 @@ let g:loaded_cljreloaded = 1
 let g:cljreloaded_setbindings = 1
 let g:cljreloaded_bindingprefix = "cr"
 let g:cljreloaded_queryclojars = 1
+let g:cljreloaded_connected = 0
 let g:cljreloaded_queriedclojars = 0
 let g:cljreloaded_clojarsurl = "http://clojars.org/repo/all-jars.clj"
 let g:cljreloaded_lasthotload = ""
@@ -294,6 +295,7 @@ autocmd FileType clojure command! -buffer ReloadedLoadAvailableJars :call s:Load
 try
   let client = fireplace#platform()
   if has_key(client, 'connection')
+    let g:cljreloaded_connected = 1
     let ns = fireplace#eval("
                   \  (try
                   \    (do (in-ns 'dev) (clojure.core/use 'clojure.core) (use 'dev) \"dev\")

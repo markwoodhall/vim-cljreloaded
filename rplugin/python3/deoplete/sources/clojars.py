@@ -20,6 +20,11 @@ class Source(Base):
         col = self.vim.call('col', '.')-1
         to_cursor = line[:col]
 
+        connected = self.vim.eval('g:cljreloaded_connected')
+
+        if not connected:
+            return []
+
         if 'project.clj' not in filename and 'build.boot' not in filename:
             return []
 
