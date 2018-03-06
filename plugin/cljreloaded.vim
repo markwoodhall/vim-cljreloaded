@@ -89,7 +89,7 @@ endfunction
 function! cljreloaded#AllAvailableJars(term)
   if !g:cljreloaded_queriedclojars
     echomsg "No data has been loaded from Clojars. This might be because there was no active REPL connection when the plugin loaded.
-            \ Data will be begin downloading in the background. Try the command again in a moment."
+            \ Data will begin downloading in the background. Try the command again in a moment."
     call s:LoadAvailableJars(1)
   endif
   let eval = "
