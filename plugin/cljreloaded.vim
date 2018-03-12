@@ -312,6 +312,7 @@ endtry
 
 
 if g:cljreloaded_setbindings
+  execute "autocmd filetype clojure nnoremap <buffer> ".g:cljreloaded_bindingprefix."e :Eval<CR>"
   execute "autocmd filetype clojure nnoremap <buffer> ".g:cljreloaded_bindingprefix."R :Require<CR>"
 
   execute "autocmd filetype clojure nnoremap <buffer> ".g:cljreloaded_bindingprefix."g :ReloadedGo<CR>"
