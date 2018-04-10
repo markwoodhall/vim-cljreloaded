@@ -313,12 +313,12 @@ endtry
 
 if g:cljreloaded_setbindings
   execute "autocmd filetype clojure nnoremap <buffer> ".g:cljreloaded_bindingprefix."e :Eval<CR>"
-  execute "autocmd filetype clojure nnoremap <buffer> ".g:cljreloaded_bindingprefix."R :Require<CR>"
+  execute "autocmd filetype clojure nnoremap <buffer> ".g:cljreloaded_bindingprefix."r :Require<CR>"
 
   execute "autocmd filetype clojure nnoremap <buffer> ".g:cljreloaded_bindingprefix."g :ReloadedGo<CR>"
   execute "autocmd filetype clojure nnoremap <buffer> ".g:cljreloaded_bindingprefix."s :ReloadedStart<CR>"
   execute "autocmd filetype clojure nnoremap <buffer> ".g:cljreloaded_bindingprefix."q :ReloadedStop<CR>"
-  execute "autocmd filetype clojure nnoremap <buffer> ".g:cljreloaded_bindingprefix."r :ReloadedReset<CR>"
+  execute "autocmd filetype clojure nnoremap <buffer> ".g:cljreloaded_bindingprefix."R :ReloadedReset<CR>"
   execute "autocmd filetype clojure nnoremap <buffer> ".g:cljreloaded_bindingprefix."ra :ReloadedResetAll<CR>"
 
   execute "autocmd filetype clojure nnoremap <buffer> ".g:cljreloaded_bindingprefix."d :ReloadedHotLoadDepUnderCursor<CR>"
