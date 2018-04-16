@@ -179,15 +179,26 @@ function! s:HotLoadDependency(dependency)
 endfunction
 
 function! s:HotLoadDepUnderCursor()
-    let restorePos = getpos('.')
-    call search('[', 'b')
-    let cursorPos = getpos('.')
-    call search(']')
-    let endCursorPos = getpos('.')
-    let line = getline('.')
-    let dep = strpart(line, cursorPos[2], (endCursorPos[2]-1)-(cursorPos[2]))
-    call s:HotLoadDependency(dep)
-    call setpos('.', restorePos)
+  let restorePos = getpos('.')
+  call search('[', 'b')
+  let cursorPos = getpos('.')
+  call search(']')
+  let endCursorPos = getpos('.')
+  let line = getline('.')
+  let dep = strpart(line, cursorPos[2], (endCursorPos[2]-1)-(cursorPos[2]))
+  call s:HotLoadDependency(dep)
+  call setpos('.', restorePos)
+endfunction
+
+function! s:CleanNsUnderCursor()
+  let path = expand('%')
+  let new_ns = s:SilentSendToRepl('(refactor-nrepl.ns.pprint/pprint-ns (refactor-nrepl.ns.clean-ns/clean-ns {:path "'.path.'"}))')[1:-2]
+  let restorePos = getpos('.')
+  let endCursorPos = searchpairpos('(', '', ')')[0]
+  call setpos('.', restorePos)
+  execute 'd'.endCursorPos
+  call setpos('.', restorePos)
+  call append(0, split(new_ns, '\\n'))
 endfunction
 
 function! s:NsComplete(A, L, P) abort
@@ -291,6 +302,8 @@ autocmd FileType clojure command! -buffer ReloadedHotLoadDepNoSnapshotsFzf :call
 autocmd FileType clojure command! -buffer ReloadedHotLoadDepNoSnapshotsSilentFzf :call s:DependencyCompleteFzf(s:NonSnapshotJars(''), 0)
 autocmd FileType clojure command! -buffer ReloadedHotLoadDepUnderCursor :call s:HotLoadDepUnderCursor()
 autocmd FileType clojure command! -buffer ReloadedLoadAvailableJars :call s:LoadAvailableJars(0)
+
+autocmd FileType clojure command! -buffer ReloadedCleanNsUnderCursor :call s:CleanNsUnderCursor()
 
 try
   let client = fireplace#platform()
