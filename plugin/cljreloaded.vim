@@ -10,6 +10,7 @@ let g:cljreloaded_connected = 0
 let g:cljreloaded_queriedclojars = 0
 let g:cljreloaded_clojarsurl = "http://clojars.org/repo/all-jars.clj"
 let g:cljreloaded_lasthotload = ""
+let g:cljreloaded_prefix_rewriting = 0
 
 let g:cljreloaded_dev_ns = "user"
 
@@ -192,13 +193,20 @@ endfunction
 
 function! s:CleanNsUnderCursor()
   let path = expand('%')
-  let new_ns = s:SilentSendToRepl('(refactor-nrepl.ns.pprint/pprint-ns (refactor-nrepl.ns.clean-ns/clean-ns {:path "'.path.'"}))')[1:-2]
+  let prefix_rewriting = g:cljreloaded_prefix_rewriting == 1 ? 'true' : 'false'
+  let new_ns = s:SilentSendToRepl('
+              \ (refactor-nrepl.config/with-config { :prune-ns-form true :prefix-rewriting ' . prefix_rewriting . ' }
+              \   (refactor-nrepl.ns.pprint/pprint-ns (refactor-nrepl.ns.clean-ns/clean-ns {:path "'.path.'"})))')[1:-2]
+  if new_ns !~ '^(ns'
+    echoerr 'There was a problem cleaning the namespace, was the cursor on the ns form?'
+  endif
   let restorePos = getpos('.')
   let endCursorPos = searchpairpos('(', '', ')')[0]
   call setpos('.', restorePos)
   execute 'd'.endCursorPos
   call setpos('.', restorePos)
   call append(0, split(new_ns, '\\n'))
+  call setpos('.', restorePos)
 endfunction
 
 function! s:NsComplete(A, L, P) abort
@@ -337,6 +345,8 @@ if g:cljreloaded_setbindings
   execute "autocmd filetype clojure nnoremap <buffer> ".g:cljreloaded_bindingprefix."d :ReloadedHotLoadDepUnderCursor<CR>"
   execute "autocmd filetype clojure nnoremap <buffer> ".g:cljreloaded_bindingprefix."ds :ReloadedHotLoadDepSilentFzf<CR>"
   execute "autocmd filetype clojure nnoremap <buffer> ".g:cljreloaded_bindingprefix."dp :ReloadedHotLoadDepFzf<CR>"
+
+  execute "autocmd filetype clojure nnoremap <buffer> ".g:cljreloaded_bindingprefix."ns :ReloadedCleanNsUnderCursor<CR>"
 
   execute "autocmd filetype clojure nnoremap <buffer> ".g:cljreloaded_bindingprefix."n :ReloadedNsFzf<CR>"
   execute "autocmd filetype clojure nnoremap <buffer> ".g:cljreloaded_bindingprefix."un :ReloadedUseNsFzf<CR>"
