@@ -346,7 +346,7 @@ if g:cljreloaded_setbindings
   execute "autocmd filetype clojure nnoremap <buffer> ".g:cljreloaded_bindingprefix."ds :ReloadedHotLoadDepSilentFzf<CR>"
   execute "autocmd filetype clojure nnoremap <buffer> ".g:cljreloaded_bindingprefix."dp :ReloadedHotLoadDepFzf<CR>"
 
-  execute "autocmd filetype clojure nnoremap <buffer> ".g:cljreloaded_bindingprefix."ns :ReloadedCleanNsUnderCursor<CR>"
+  execute "autocmd filetype clojure nnoremap <buffer> ".g:cljreloaded_bindingprefix."cn :ReloadedCleanNsUnderCursor<CR>"
 
   execute "autocmd filetype clojure nnoremap <buffer> ".g:cljreloaded_bindingprefix."n :ReloadedNsFzf<CR>"
   execute "autocmd filetype clojure nnoremap <buffer> ".g:cljreloaded_bindingprefix."un :ReloadedUseNsFzf<CR>"
