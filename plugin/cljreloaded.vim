@@ -199,6 +199,9 @@ function! s:CleanNsUnderCursor()
               \   (refactor-nrepl.ns.pprint/pprint-ns (refactor-nrepl.ns.clean-ns/clean-ns {:path "'.path.'"})))')[1:-2]
   if new_ns !~ '^(ns'
     echoerr 'There was a problem cleaning the namespace, was the cursor on the ns form?'
+  elseif new_ns =~ '^(ns nil'
+    echo 'ns form is already clean'
+    return
   endif
   let restorePos = getpos('.')
   let endCursorPos = searchpairpos('(', '', ')')[0]
