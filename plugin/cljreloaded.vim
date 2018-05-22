@@ -196,8 +196,9 @@ function! s:CleanNsUnderCursor()
   let prefix_rewriting = g:cljreloaded_prefix_rewriting == 1 ? 'true' : 'false'
   let new_ns = s:SilentSendToRepl("
               \ (require '[refactor-nrepl.ns.pprint :as nrepl-ns])
+              \ (require '[refactor-nrepl.ns.clean-ns :as clean-ns])
               \ (refactor-nrepl.config/with-config { :prune-ns-form true :prefix-rewriting " . prefix_rewriting . " }
-              \   (nrepl-ns/pprint-ns (refactor-nrepl.ns.clean-ns/clean-ns {:path \"".path."\"})))")[1:-2]
+              \   (nrepl-ns/pprint-ns (clean-ns/clean-ns {:path \"".path."\"})))")[1:-2]
   if new_ns !~ '^(ns'
     echoerr 'There was a problem cleaning the namespace, was the cursor on the ns form?'
   elseif new_ns =~ '^(ns nil'
