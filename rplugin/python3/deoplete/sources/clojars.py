@@ -25,14 +25,20 @@ class Source(Base):
         if not connected:
             return []
 
-        if 'project.clj' not in filename and 'build.boot' not in filename:
+        if 'project.clj' not in filename and 'build.boot' not in filename and 'deps.edn' not in filename:
             return []
 
-        if '[' not in to_cursor:
+        if '[' not in to_cursor and 'deps.edn' not in filename:
             return []
 
         titles = [{'word': x,
                    'menu': x,
                    'info': x}
                    for x in self.vim.call('cljreloaded#AllAvailableJars', complete_str)]
+
+        if 'deps.edn' in filename:
+            titles = [{'word': x.split()[0] + ' {:mvn/version ' + x.split()[1] + '}',
+                       'menu': x,
+                       'info': x}
+                       for x in self.vim.call('cljreloaded#AllAvailableJars', complete_str)]
         return titles
