@@ -118,10 +118,13 @@ endfunction
 function! s:LoadAvailableJars(silent)
   let s:clojarsJarsDownload = "
     \  (defonce cljreloaded-jars (atom []))
+    \  (defonce cljreloaded-error (atom []))
     \  (require '[clojure.edn :as edn])
-    \  (future (try (let [jars (edn/read-string (str \"[\" (slurp \"".g:cljreloaded_clojarsurl."\") \"]\"))]
+    \  (future (try (let [raw (str \"[\" (slurp \"".g:cljreloaded_clojarsurl."\") \"]\")
+    \                     clean (clojure.string/replace raw #\"\\\[\\\w*/\\\d.*]\" \"\")
+    \                     jars (edn/read-string clean)]
     \                 (reset! cljreloaded-jars (distinct jars)))
-    \            (catch Exception e (reset! cljreloaded-jars []))))"
+    \            (catch Exception e (reset! cljreloaded-jars []) (reset! cljreloaded-error e))))"
 
   if a:silent
     call s:SilentSendToRepl(s:clojarsJarsDownload)
