@@ -214,6 +214,12 @@ function! s:CleanNsUnderCursor()
   call setpos('.', restorePos)
 endfunction
 
+function! s:InsertNsDefinition()
+  if &buftype !~# '^no' && &modifiable
+    call append(0, '(ns ' . substitute(join(split(split(expand('%'), "\\.")[0], "/")[-2:-1], "."), "/", "\\.", "g") . ')')
+  endif
+endfunction
+
 function! s:NsComplete(A, L, P) abort
   if strpart(a:L, 0, a:P) !~# ' [[:alnum:]-]\+ '
     let cmds = s:AllNs(a:A)
@@ -317,6 +323,7 @@ autocmd FileType clojure command! -buffer ReloadedHotLoadDepUnderCursor :call s:
 autocmd FileType clojure command! -buffer ReloadedLoadAvailableJars :call s:LoadAvailableJars(0)
 
 autocmd FileType clojure command! -buffer ReloadedCleanNsUnderCursor :call s:CleanNsUnderCursor()
+autocmd FileType clojure command! -buffer ReloadedInsertNsDefinition :call s:InsertNsDefinition()
 
 try
   let client = fireplace#platform()
@@ -358,3 +365,5 @@ if g:cljreloaded_setbindings
   execute "autocmd filetype clojure nnoremap <buffer> ".g:cljreloaded_bindingprefix."in :ReloadedInNsFzf<CR>"
   execute "autocmd filetype clojure nnoremap <buffer> ".g:cljreloaded_bindingprefix."rn :ReloadedRequireNsFzf<CR>"
 endif
+
+autocmd BufNewFile *.clj,*.clj[cs] :call s:InsertNsDefinition()
