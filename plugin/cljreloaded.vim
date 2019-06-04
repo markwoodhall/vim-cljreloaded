@@ -325,6 +325,9 @@ autocmd FileType clojure command! -buffer ReloadedLoadAvailableJars :call s:Load
 autocmd FileType clojure command! -buffer ReloadedCleanNsUnderCursor :call s:CleanNsUnderCursor()
 autocmd FileType clojure command! -buffer ReloadedInsertNsDefinition :call s:InsertNsDefinition()
 
+autocmd FileType * command! -buffer ReloadedLein :terminal lein repl
+autocmd FileType * command! -buffer ReloadedClj :terminal clj -A:dev:dev/nrepl
+
 try
   let client = fireplace#platform()
   if has_key(client, 'connection')
