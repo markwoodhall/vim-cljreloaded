@@ -39,9 +39,14 @@ function! s:LargeOutputFromRepl(eval)
   let plength = fireplace#session_eval("*print-length*",{"ns": g:cljreloaded_dev_ns})
   call fireplace#session_eval("(set! *print-length* nil)",{"ns": g:cljreloaded_dev_ns})
 
-  let out = fireplace#session_eval(a:eval, {"ns": g:cljreloaded_dev_ns})
+  let filename = tempname()
+  let eval_wrapper = "(spit \"" . filename . "\"" . a:eval . ")"
+  call fireplace#session_eval(eval_wrapper, {"ns": g:cljreloaded_dev_ns})
   call fireplace#session_eval("(set! *print-length* ".plength.")",{"ns": g:cljreloaded_dev_ns})
-  return out
+
+  let eval_slurp = "(slurp \"" . filename . "\")"
+  let out = readfile(filename)
+  return join(out, "\n")
 endfunction
 
 function! s:AllNs(term)
