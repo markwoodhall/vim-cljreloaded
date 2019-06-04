@@ -46,6 +46,7 @@ function! s:LargeOutputFromRepl(eval)
 
   let eval_slurp = "(slurp \"" . filename . "\")"
   let out = readfile(filename)
+  call delete(filename)
   return join(out, "\n")
 endfunction
 
@@ -288,8 +289,7 @@ function! s:NsCompleteFzfSink(str) abort
     call feedkeys("i")
   elseif s:action == "publics"
     call s:SilentSendToRepl("(-> {} 
-                               \ (assoc :doc (clojure.repl/doc ".a:str.")) 
-                               \ (assoc :source (clojure.repl/source ".a:str.")))")
+                               \ (assoc :doc (clojure.repl/doc ".a:str.")))")
   else
     call s:InNs(a:str)
   endif
