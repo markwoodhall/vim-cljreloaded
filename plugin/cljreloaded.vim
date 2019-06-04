@@ -83,6 +83,12 @@ function! s:AllNsPublics(ns)
   return s:ToList(allPublics)
 endfunction
 
+function! s:AllPublics(search)
+  let eval = "(vec (map str (clojure.repl/apropos \"". a:search ."\")))"
+  let allPublics = s:LargeOutputFromRepl(eval)
+  return s:ToList(allPublics)
+endfunction
+
 function! s:AllAvailableJars(term) abort
   return cljreloaded#AllAvailableJars(a:term)
 endfunction
@@ -316,6 +322,7 @@ autocmd FileType clojure command! -buffer ReloadedRefreshAll :call s:RefreshAll(
 autocmd FileType clojure command! -buffer ReloadedUseNsFzf :call s:NsCompleteFzf(s:AllNs(''), 'use')
 autocmd FileType clojure command! -buffer ReloadedInNsFzf :call s:NsCompleteFzf(s:AllNs(''), 'in')
 autocmd FileType clojure command! -buffer ReloadedNsFzf :call s:NsCompleteFzf(s:AllNs(''), 'ns')
+autocmd FileType clojure command! -buffer ReloadedAproposFzf :call s:NsCompleteFzf(s:AllPublics(''), 'publics')
 autocmd FileType clojure command! -buffer ReloadedRequireNsFzf :call s:NsCompleteFzf(s:AllNs(''), 'require')
 autocmd FileType clojure command! -buffer ReloadedHotLoadDepFzf :call s:DependencyCompleteFzf(s:AllAvailableJars(''), 1)
 autocmd FileType clojure command! -buffer ReloadedHotLoadDepSilentFzf :call s:DependencyCompleteFzf(s:AllAvailableJars(''), 0)
