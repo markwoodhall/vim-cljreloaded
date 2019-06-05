@@ -231,7 +231,13 @@ endfunction
 
 function! s:InsertNsDefinition()
   if &buftype !~# '^no' && &modifiable
-    call append(0, '(ns ' . substitute(join(split(split(expand('%'), "\\.")[0], "/")[-2:-1], "."), "/", "\\.", "g") . ')')
+    let path = split(expand('%'), "\\.")[0]
+    let parts = split(path, "/")[-2:-1]
+    let parts = join(parts, ".")
+    let ns = substitute(parts, "/", "\\.", "g") 
+    let ns = substitute(ns, "_", "-", "g") 
+
+    call append(0, '(ns ' . ns . ')')
   endif
 endfunction
 
