@@ -14,7 +14,7 @@ let g:cljreloaded_prefix_rewriting = 0
 
 let g:cljreloaded_dev_ns = "user"
 
-if !exists("*fireplace#eval")
+if g:loaded_fireplace != 1
   echoerr "vim-cljreloaded requires the vim-fireplace plugin but it is not currently loaded or installed."
   finish
 endif
