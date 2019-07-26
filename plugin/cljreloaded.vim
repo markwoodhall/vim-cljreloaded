@@ -232,7 +232,9 @@ endfunction
 function! s:InsertNsDefinition()
   if &buftype !~# '^no' && &modifiable
     let path = split(expand('%'), "\\.")[0]
-    let parts = split(path, "/")[-2:-1]
+    let clean_path = substitute(path, '^src/', '', 'g') 
+    let clean_path = substitute(clean_path, '^test/', '', 'g') 
+    let parts = split(clean_path, "/")
     let parts = join(parts, ".")
     let ns = substitute(parts, "/", "\\.", "g") 
     let ns = substitute(ns, "_", "-", "g") 
