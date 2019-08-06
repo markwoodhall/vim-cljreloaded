@@ -297,7 +297,7 @@ function! s:NsCompleteFzfSink(str) abort
     call feedkeys("i")
   elseif s:action == "publics"
     call s:SilentSendToRepl("(-> {} 
-                               \ (assoc :doc (clojure.repl/doc ".a:str.")))")
+                               \ (assoc :source (clojure.repl/source ".a:str.")))")
   else
     call s:InNs(a:str)
   endif
