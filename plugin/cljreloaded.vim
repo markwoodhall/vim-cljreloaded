@@ -229,8 +229,7 @@ function! s:CleanNsUnderCursor()
   call setpos('.', restorePos)
 endfunction
 
-function! s:InsertNsDefinition()
-  if &buftype !~# '^no' && &modifiable
+function! s:GetNsDefinition()
     let path = split(expand('%'), "\\.")[0]
     let clean_path = substitute(path, '^src/', '', 'g') 
     let clean_path = substitute(clean_path, '^test/', '', 'g') 
@@ -238,6 +237,12 @@ function! s:InsertNsDefinition()
     let parts = join(parts, ".")
     let ns = substitute(parts, "/", "\\.", "g") 
     let ns = substitute(ns, "_", "-", "g") 
+    return ns
+endfunction
+
+function! s:InsertNsDefinition()
+  if &buftype !~# '^no' && &modifiable
+    let ns = s:GetNsDefinition()
 
     call append(0, '(ns ' . ns . ')')
   endif
@@ -396,3 +401,4 @@ if g:cljreloaded_setbindings
 endif
 
 autocmd BufNewFile *.clj,*.clj[cs] :call s:InsertNsDefinition()
+autocmd BufEnter *.clj,*.clj[cs] :write | try | call s:InNs(s:GetNsDefinition()) | catch | endtry
