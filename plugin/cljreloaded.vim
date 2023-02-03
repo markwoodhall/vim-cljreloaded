@@ -277,7 +277,7 @@ function! s:DependencyCompleteFzf(actions, dump) abort
   endif
   call fzf#run({
   \ 'source': s:actions,
-  \ 'down': '40%',
+  \ 'window': { 'width': 0.7, 'height': 0.7 },
   \ 'sink': function('s:DependencyCompleteFzfSink')})
 endfunction
 
@@ -292,12 +292,12 @@ function! s:NsCompleteFzfSink(str) abort
     let s:action = "publics"
     call fzf#run({
     \ 'source': s:actions,
-    \ 'down': '40%',
+    \ 'window': { 'width': 0.7, 'height': 0.7 },
     \ 'sink': function('s:NsCompleteFzfSink')})
     call feedkeys("i")
   elseif s:action == "publics"
-    call s:SilentSendToRepl("(-> {} 
-                               \ (assoc :source (clojure.repl/source ".a:str.")))")
+    let tt = s:SilentSendToRepl("(with-out-str (clojure.repl/source ".a:str."))")
+    execute 'echon ' .. tt
   else
     call s:InNs(a:str)
   endif
@@ -317,6 +317,7 @@ function! s:NsCompleteFzf(actions, action) abort
   call fzf#run({
   \ 'source': s:actions,
   \ 'down': '40%',
+  \ 'window': { 'width': 0.7, 'height': 0.7 },
   \ 'sink': function('s:NsCompleteFzfSink')})
 endfunction
 
