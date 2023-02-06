@@ -141,7 +141,7 @@ function! s:LoadAvailableJars(silent)
 endfunction
 
 function! s:System()
-  let evalString = "(require '[clojure.pprint :refer [pprint]]) (pprint system)"
+  let evalString = "(require '[clojure.pprint :refer [pprint]]) (with-out-str (pprint system))"
   call s:SendToRepl(evalString)
 endfunction
 
@@ -401,4 +401,3 @@ if g:cljreloaded_setbindings
 endif
 
 autocmd BufNewFile *.clj,*.clj[cs] :call s:InsertNsDefinition()
-autocmd BufEnter *.clj,*.clj[cs] :write | try | call s:InNs(s:GetNsDefinition()) | catch | endtry
