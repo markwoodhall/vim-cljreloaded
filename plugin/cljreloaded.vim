@@ -326,6 +326,14 @@ function! s:NsCompleteFzf(actions, action) abort
   \ 'sink': function('s:NsCompleteFzfSink')})
 endfunction
 
+function! cljreloaded#all_ns()
+  return s:AllNs('')
+endfunction
+
+function! cljreloaded#all_publics()
+  return s:AllPublics('')
+endfunction
+
 autocmd FileType clojure command! -nargs=1 -complete=customlist,s:NsComplete -buffer ReloadedRequireNs :call s:RequireNs(<q-args>)
 autocmd FileType clojure command! -nargs=1 -complete=customlist,s:NsComplete -buffer ReloadedInNs :call s:InNs(<q-args>)
 autocmd FileType clojure command! -nargs=1 -complete=customlist,s:NsComplete -buffer ReloadedUseNs :call s:UseNs(<q-args>)
