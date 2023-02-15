@@ -334,12 +334,24 @@ function! cljreloaded#all_publics()
   return s:AllPublics('')
 endfunction
 
+function! cljreloaded#ns_publics(ns)
+  return s:AllNsPublics(a:ns)
+endfunction
+
+function! cljreloaded#source(sym)
+  let o = s:SilentSendToRepl("(with-out-str (clojure.repl/source ".a:sym."))")
+  return o
+endfunction
+
+autocmd FileType clojure command! -nargs=1 -complete=customlist,s:NsComplete -buffer ReloadedSource :echon cljreloaded#source(<q-args>)
 autocmd FileType clojure command! -nargs=1 -complete=customlist,s:NsComplete -buffer ReloadedRequireNs :call s:RequireNs(<q-args>)
 autocmd FileType clojure command! -nargs=1 -complete=customlist,s:NsComplete -buffer ReloadedInNs :call s:InNs(<q-args>)
 autocmd FileType clojure command! -nargs=1 -complete=customlist,s:NsComplete -buffer ReloadedUseNs :call s:UseNs(<q-args>)
 autocmd FileType clojure command! -nargs=1 -complete=customlist,s:DependencyComplete -buffer ReloadedHotLoadDep :call s:HotLoadDependency(<q-args>)
 autocmd FileType clojure command! -nargs=1 -complete=customlist,s:NsComplete -buffer ReloadedNsPublicsFzf :call s:NsCompleteFzf(s:AllNsPublics(<q-args>), 'publics')
 
+
+autocmd FileType clojure command! -buffer ReloadedThisNs :call s:InNs(s:GetNsDefinition())
 autocmd FileType clojure command! -buffer ReloadedSystem :call s:System()
 autocmd FileType clojure command! -buffer ReloadedReset :call s:Reset()
 autocmd FileType clojure command! -buffer ReloadedResetAll :call s:ResetAll()
