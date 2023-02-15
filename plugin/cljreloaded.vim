@@ -339,11 +339,15 @@ function! cljreloaded#ns_publics(ns)
 endfunction
 
 function! cljreloaded#source(sym)
-  let o = s:SilentSendToRepl("(with-out-str (clojure.repl/source ".a:sym."))")
-  return o
+  return s:SilentSendToRepl("(with-out-str (clojure.repl/source ".a:sym."))")
 endfunction
 
-autocmd FileType clojure command! -nargs=1 -complete=customlist,s:NsComplete -buffer ReloadedSource :echon cljreloaded#source(<q-args>)
+function! s:ReloadedSource(sym)
+  let source = cljreloaded#source(a:sym)
+  execute "echon " .. source
+endfunction
+
+autocmd FileType clojure command! -nargs=1 -complete=customlist,s:NsComplete -buffer ReloadedSource :call s:ReloadedSource(<q-args>)
 autocmd FileType clojure command! -nargs=1 -complete=customlist,s:NsComplete -buffer ReloadedRequireNs :call s:RequireNs(<q-args>)
 autocmd FileType clojure command! -nargs=1 -complete=customlist,s:NsComplete -buffer ReloadedInNs :call s:InNs(<q-args>)
 autocmd FileType clojure command! -nargs=1 -complete=customlist,s:NsComplete -buffer ReloadedUseNs :call s:UseNs(<q-args>)
