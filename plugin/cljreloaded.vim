@@ -58,7 +58,7 @@ function! s:AllNs(term)
               \   (catch Exception error 0))"
 
   let exists = s:SilentSendToRepl(eval)
-  if exists
+  if exists != '0'
     let eval = "
               \ (let [namespaces (distinct (concat (map str (all-ns)) (map str (find-namespaces-on-classpath))))]
               \   (vec (filter #(clojure.string/starts-with? %1 \"".a:term."\") namespaces)))"
@@ -230,6 +230,10 @@ function! s:CleanNsUnderCursor()
 endfunction
 
 function! s:GetNsDefinition()
+  return split(getline(1), ' ')[1]
+endfunction
+
+function! s:NewNsDefinition()
     let path = split(expand('%'), "\\.")[0]
     let clean_path = substitute(path, '^src/', '', 'g') 
     let clean_path = substitute(clean_path, '^test/', '', 'g') 
@@ -242,7 +246,7 @@ endfunction
 
 function! s:InsertNsDefinition()
   if &buftype !~# '^no' && &modifiable
-    let ns = s:GetNsDefinition()
+    let ns = s:NewNsDefinition()
 
     call append(0, '(ns ' . ns . ')')
   endif
