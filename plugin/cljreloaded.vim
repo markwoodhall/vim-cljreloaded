@@ -429,3 +429,4 @@ if g:cljreloaded_setbindings
 endif
 
 autocmd BufNewFile *.clj,*.clj[cs] :call s:InsertNsDefinition()
+autocmd BufEnter *.clj,*.clj[cs] :let g:cljreloaded_dev_ns = s:GetNsDefinition()
