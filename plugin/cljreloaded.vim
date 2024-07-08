@@ -147,26 +147,32 @@ endfunction
 
 function! s:Reset()
   call s:SendToRepl("(reset)")
+  execute "Require!"
 endfunction
 
 function! s:ResetAll()
   call s:SendToRepl("(reset-all)")
+  execute "Require!"
 endfunction
 
 function! s:Init()
   call s:SendToRepl("(init)")
+  execute "Require!"
 endfunction
 
 function! s:Start()
   call s:SendToRepl("(start)")
+  execute "Require!"
 endfunction
 
 function! s:Stop()
   call s:SendToRepl("(stop)")
+  execute "Require!"
 endfunction
 
 function! s:Go()
   call s:SendToRepl("(go)")
+  execute "Require!"
 endfunction
 
 function! s:Refresh()
